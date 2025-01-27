@@ -1,0 +1,445 @@
+---
+title: "Improved 21st Century Projections"
+subtitle: "PhD Midterm Presentation"
+author:
+  - name: Brynjólfur Gauti Guðrúnar Jónsson
+institute: "University of Iceland"
+format: 
+  revealjs:
+    theme: theme.scss
+    simplemenu:
+      flat: false
+      barhtml:
+        header: "<div class='menubar mb-10'><ul class='menu'></ul><div>"
+        footer: "<div class='footer footer-default' style='display: block;'> <a href='https://bggj.is/midtermpresentation' target='_blank'>bggj.is/midtermpresentation</a></div>"
+html-math-method:
+  method: mathjax
+  url: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+revealjs-plugins:
+  - simplemenu
+bibliography: references.bib
+csl: cambridge-university-press-numeric.csl
+---
+
+## Introduction {data-name="Background"}
+
+
+
+## Data 
+
+::: {.columns style="font-size:70%"}
+::: {.column width="70%"}
+-   UKCP Local Projections on a 5km grid over the UK (1980-2080) [@metoffi]
+-   Challenge: Modeling maximum daily precipitation in yearly blocks
+    -   43,920 spatial locations on a 180 x 244 grid
+    -   Four parameters per location as in [@johannesson2021]
+        -   Location, Trend, Scale, Shape
+-   Two aspects of spatial dependence:
+    1.  GEV parameters (ICAR models)
+    2.  Data-level dependence (Copulas)
+:::
+
+::: {.column width="30%"}
+![](images/ukcp_data.png){width="100%"}
+:::
+:::
+
+## Calculating Multivariate Normal Densities
+
+::: {.columns style="font-size:60%"}
+$$
+\log f(\mathbf{x}) \propto \frac{1}{2}\left(\log |\mathbf{Q}| - \mathbf{x}^T\mathbf{Q}\mathbf{x}\right)
+$$
+
+::: {.column width="50%"}
+### Computational challenges
+
+1.  **Log Determinant**: $\log |\mathbf{Q}|$
+    -   Constant for a given precision matrix
+2.  **Quadratic Form**: $\mathbf{x}^T\mathbf{Q}\mathbf{x}$
+    -   Needs calculation for each density evaluation
+:::
+
+::: {.column width="50%"}
+### Spatial Model Considerations
+
+-   Some models (e.g., ICAR) avoid log determinant calculation
+-   Efficient computation crucial for large-scale applications
+-   Fast algorithms when $\mathbf{Q}$ is sparse [@rue2001; @rue2005]
+:::
+:::
+
+## Spatial Models
+
+::: {style="font-size:50%"}
+#### Conditional Autoregression (CAR) [@besag1974]
+
+::: columns
+::: {.column width="50%"}
+-   $\mathbf{D}$ is a diagonal matrix with $D_{ii} = n_i$, the number of neighbours of $i$
+-   $\mathbf{A}$ is the adjacency matrix with $A_{ij} = A_{ji} = 1$ if $i \sim j$
+:::
+
+::: {.column width="50%"}
+$$
+\begin{aligned}
+\mathbf{x} &\sim N(\mathbf{0}, \tau \mathbf{Q}) \\
+\mathbf{Q} &= \mathbf{D}\left(\mathbf{I} - \alpha \mathbf{A} \right)
+\end{aligned}
+$$
+:::
+:::
+
+------------------------------------------------------------------------
+
+#### Intrinsic Conditional Autoregression (ICAR) [@besag1991]
+
+::: columns
+::: {.column width="50%"}
+-   $\alpha = 1$, so $\mathbf Q$ is singular, but constant
+-   Don't have to calculate $\log |\mathbf{Q}|$
+:::
+
+::: {.column width="50%"}
+$$
+\begin{aligned}
+\mathbf{x} &\sim N(\mathbf{0}, \tau \mathbf{Q}) \\
+\mathbf{Q} &= \mathbf{D} - \mathbf{A}
+\end{aligned}
+$$
+:::
+:::
+
+------------------------------------------------------------------------
+
+::: columns
+::: {.column width="50%"}
+#### BYM (Besag-York-Mollié) Model [@besag1991]
+
+-   $\mathbf{u}$ is the structured spatial component (Besag model)
+-   $\mathbf{v}$ is the unstructured component (i.i.d. normal)
+:::
+
+::: {.column width="50%"}
+$$
+\begin{aligned}
+\mathbf{x} &= \mathbf{u} + \mathbf{v} \\
+\mathbf{u} &\sim \mathrm{ICAR}(\tau_u) \\
+\mathbf{v} &\sim N(\mathbf{0}, \tau_v^{-1})
+\end{aligned}
+$$
+:::
+:::
+
+------------------------------------------------------------------------
+
+::: columns
+::: {.column width="50%"}
+#### BYM2 Model [@riebler2016; @simpson2015]
+
+-   $\rho$ models how much of variance is spatial
+-   $s$ is a scaling factor chosen to make $\mathrm{Var}(\mathbf u_i) \approx 1$
+:::
+
+::: {.column width="50%"}
+$$
+\begin{aligned}
+\mathbf{x} &= \left(\left(\sqrt{\rho/s}\right)\mathbf{u} + \left(\sqrt{1 - \rho}\right) \mathbf{v} \right)\sigma \\
+\mathbf{u} &\sim \mathrm{ICAR}(1) \\
+\mathbf{v} &\sim N(\mathbf{0}, n)
+\end{aligned}
+$$
+:::
+:::
+:::
+
+## From Parameter-level to Data-level Dependence
+
+::: {.columns style="font-size:60%"}
+::: {.column width="50%"}
+### Parameter-level Dependence
+
+-   Assumes conditional independence
+-   Biased joint probability estimates
+-   Underestimates parameter variance
+:::
+
+::: {.column width="50%"}
+### Copula
+
+-   Improves joint probabilities
+-   Enhances spatial risk assessment
+-   Better variance estimates
+:::
+:::
+
+::: {style="font-size:65%; margin-top:20px;"}
+**Sklar's Theorem**: For any multivariate distribution $H$, there exists a unique copula $C$ such that:
+
+$$
+H(\mathbf x) = C(F_1(x_1), \dots, F_d(x_d))
+$$
+
+where $F_i$ are marginal distributions. We can also write this as a density
+
+$$
+h(x) = c(F_1(x_1), \dots, F_d(x_d)) \prod_{i=1}^d f_i(x_i)
+$$
+
+:::
+
+## Our Approach: Matérn-like Gaussian Copula
+
+::: {style="font-size:55%"}
+
+$$
+\begin{gathered}
+\log h(\mathbf x) = \log c\left(F_1(x_1), \dots, F_d(x_d)\right) + \sum_{i=1}^d \log f_i(x_i)
+\end{gathered}
+$$
+
+------------------------------------------------------------------------
+
+::: columns
+### Marginal CDFs
+
+::: {.column width="50%"}
+-   $F_i(x_i)$ is $\mathrm{GEV}(\mu_i, \sigma_i, \xi_i)$
+-   Can model parameter dependence with BYM2
+:::
+
+::: {.column width="50%"}
+$$
+\begin{aligned}
+\log h(\mathbf x) &= \log c(u_1, \dots, u_d) \\
+&+ \sum_{i=1}^d \log f_{\mathrm{GEV}}(x_i \vert \mu_i, \sigma_i, \xi_i) \\
+u_i &= F_{\mathrm{GEV}}(x_i \vert \mu_i, \sigma_i, \xi_i)
+\end{aligned}
+$$
+:::
+:::
+
+------------------------------------------------------------------------
+
+::: columns
+### Gaussian Copula
+
+::: {.column width="50%"}
+-   Matérn-like precision matrix $\mathbf{Q}$ [@lindgren2011]
+-   If $\mathbf{Q} = \mathbf{I}$ simplifies to independent margins
+-   Scaled so $\boldsymbol{\Sigma} = \mathbf{Q}^{-1}$ is correlation matrix
+-   Need to calculate marginal variances [@rue2005a; @rue2007; @rue2009]
+-   How to generate, scale and compute with $\mathbf{Q}$ quickly (for MCMC)?
+:::
+
+::: {.column width="50%"}
+$$
+\begin{aligned}
+\log c(\mathbf u) &\propto \frac{1}{2}\left(\log |\mathbf{Q}| - \mathbf{z}^T\mathbf{Q}\mathbf{z} + \mathbf{z}^T\mathbf{z}\right) \\
+\mathbf{z} &= \Phi^{-1}(\mathbf u)
+\end{aligned}
+$$
+:::
+:::
+:::
+
+## The Precision Matrix {data-name="Methods"}
+
+::: {style="font-size:60%"}
+$\mathbf Q$ defined as Kronecker sum of two AR(1) precision matrices, similar to [@lindgren2011]
+
+$$
+\mathbf{Q} = \left( \mathbf{Q}_{\rho_1} \otimes \mathbf{I_{n_2}} + \mathbf{I_{n_1}} \otimes \mathbf{Q}_{\rho_2} \right)^{\nu + 1}, \quad \nu \in \{0, 1, 2\}
+$$
+
+::: {.columns style="font-size:80%"}
+::: {.column width="50%"}
+$$
+\mathbf{Q}_{\rho_{1}} = \frac{1}{1-\rho_{1}^2}
+\begin{bmatrix}
+1 & -\rho_{1} & 0 & \cdots & 0 \\
+-\rho_{1} & 1+\rho_{1}^2 & -\rho_{1} & \cdots & 0 \\
+0 & -\rho_{1} & 1+\rho_{1}^2 & \cdots & 0 \\
+\vdots & \vdots & \vdots & \ddots & \vdots \\
+0 & 0 & 0 & \cdots & 1
+\end{bmatrix}
+$$
+:::
+
+::: {.column width="50%"}
+$$
+\mathbf{Q}_{\rho_{2}} = \frac{1}{1-\rho_{2}^2}
+\begin{bmatrix}
+1 & -\rho_{2} & 0 & \cdots & 0 \\
+-\rho_{2} & 1+\rho_{2}^2 & -\rho_{2} & \cdots & 0 \\
+0 & -\rho_{2} & 1+\rho_{2}^2 & \cdots & 0 \\
+\vdots & \vdots & \vdots & \ddots & \vdots \\
+0 & 0 & 0 & \cdots & 1
+\end{bmatrix}
+$$
+:::
+
+$$
+\mathbf Q = \begin{bmatrix}
+\frac{1}{(1-\rho_1^2)}\mathbf{I_{n_2}} + \mathbf{Q_{\rho_2}} & \frac{-\rho_1}{(1-\rho_1^2)}\mathbf{I_{n_2}} & \dots & \cdots & \dots \\
+\frac{-\rho_1}{(1-\rho_1^2)}\mathbf{I_{n_2}} & \frac{(1+\rho_1^2)}{(1-\rho_1^2)}\mathbf{I_{n_2}} + \mathbf{Q_{\rho_2}} & \frac{-\rho_1}{(1-\rho_1^2)} \mathbf{I_{n_2}} & \cdots & \vdots  \\
+\vdots & \ddots & \ddots & \ddots & \vdots \\
+\dots & \dots & \cdots & \frac{-\rho_1}{(1-\rho_1^2)} \mathbf{I_{n_2}} & \frac{1}{(1-\rho_1^2)}\mathbf{I_{n_2}} + \mathbf{Q_{\rho_2}}
+\end{bmatrix}^{\nu + 1}
+$$
+:::
+:::
+
+## Eigendecomposition
+
+::: {.columns style="font-size:65%"}
+Because of how $\mathbf{Q}$ is defined [@horn1991], we know that
+
+$$
+\begin{aligned}
+\mathbf{Q} &= \mathbf{V}\boldsymbol{\Lambda}\mathbf{V} \\
+&= (\mathbf{V_{\rho_1}} \otimes \mathbf{V_{\rho_2}})(\boldsymbol \Lambda_{\rho_1} \otimes \mathbf{I} + \mathbf{I} \otimes \boldsymbol \Lambda_{\rho_2})^{\nu + 1}(\mathbf{V_{\rho_1}} \otimes \mathbf{V_{\rho_2}})^T
+\end{aligned}
+$$
+
+where
+
+$$
+\begin{aligned}
+\mathbf{Q}_{\rho_1} = \mathbf{V_{\rho_1}}\boldsymbol \Lambda_{\rho_1}\mathbf{V_{\rho_1}}^T \qquad \& \qquad
+\mathbf{Q}_{\rho_2} = \mathbf{V_{\rho_2}}\boldsymbol \Lambda_{\rho_2}\mathbf{V_{\rho_2}}^T
+\end{aligned}
+$$
+
+Spectral decomposition defined by value/vector pairs of smaller matrices
+
+::: {.column width="50%"}
+$$
+\left\{\lambda_{\rho_1}\right\}_i + \left\{\lambda_{\rho_2}\right\}_j
+$$
+:::
+
+::: {.column widht="50%"}
+$$
+\left\{\mathbf{v}_{\rho_1}\right\}_i \otimes \left\{\mathbf{v}_{\rho_2}\right\}_j
+$$
+:::
+
+-   Problem: $\boldsymbol \Sigma_{ii} = \left(\mathbf Q^{-1} \right)_{ii} \neq  1$
+-   Solution: $\mathbf{\widetilde  Q} = \mathbf{D}\mathbf{Q}\mathbf{D}$, where $\mathbf D_{ii} = \sqrt{\boldsymbol \Sigma_{ii}}$
+:::
+
+## Marginal Standard Deviations
+
+::: {style="font-size:70%"}
+$$
+\boldsymbol \Sigma = \mathbf Q^{-1} = (\mathbf{V}\boldsymbol\Lambda\mathbf{V}^T)^{-1} = \mathbf{V}\boldsymbol \Lambda^{-1}\mathbf{V}
+$$
+
+We know that if $A = BC$ then $A_{ii} = B_{i, .} C_{., i}$, so
+
+$$
+\boldsymbol \Sigma_{ii} = \sum_{k=1}^{n} v_{ik} \frac{1}{\lambda_k} (v^T)_{ki} = \sum_{k=1}^{n} v_{ik} \frac{1}{\lambda_k} v_{ik} = \sum_{k=1}^{n} v_{ik}^2 \frac{1}{\lambda_k}
+$$
+
+Compute vector $\boldsymbol \sigma^2$ containing all marginal variances
+
+$$ 
+\boldsymbol \sigma^2 = \sum_{i = 1}^{n_1} \sum_{j=1}^{n_2} \frac{\left(\left\{\mathbf{v}_{\rho_1}\right\}_i \otimes \left\{\mathbf{v}_{\rho_2}\right\}_j\right)^{2}}{\quad\left(\left\{\lambda_{\rho_1}\right\}_i + \left\{\lambda_{\rho_2}\right\}_j\right)^{\nu+1}}
+$$
+:::
+
+## Max-and-Smooth: Theory
+
+::: {.columns style="font-size:60%"}
+::: {.column width="50%"}
+### Two-Step Approach
+
+1. **Max Step**: Maximum Likelihood
+   - Independent local estimates
+   - Gaussian approximation
+   - Observed information matrix
+
+2. **Smooth Step**: Spatial Model
+   - Latent Gaussian model
+   - Efficient MCMC sampling
+   - Proper uncertainty propagation
+:::
+
+::: {.column width="50%"}
+### Key Properties
+
+- Asymptotic guarantees
+  - Consistent estimates
+  - Normal approximation
+  - Valid inference
+
+- Computational benefits
+  - Parallel processing
+  - Dimension reduction
+  - Sparse operations
+:::
+:::
+
+::: {style="font-size:65%; margin-top:20px;"}
+**General Framework**: For independent groups $i=1,\ldots,G$ with $n_i$ observations:
+
+$$
+\begin{aligned}
+p(y|\psi) &= \prod_{i=1}^G \prod_{j \in A_i} p(y_{ij}|\psi_i) \\
+g(\psi_i) &= X\beta + Au + \epsilon \\
+u &\sim N(0, Q_u^{-1}), \quad \epsilon \sim N(0, Q_\epsilon^{-1})
+\end{aligned}
+$$
+:::
+
+## Max-and-Smooth: Our Application {data-name="Methods"}
+
+::: {.columns style="font-size:60%"}
+::: {.column width="50%"}
+### Implementation
+
+1. **Max Step**: GEV Parameters
+   - Local parameter estimates
+   - Copula dependence structure
+   - Hessian for uncertainty
+
+2. **Smooth Step**: BYM2 Model
+   - Separate models per parameter
+   - Stan implementation
+   - Efficient sparse operations
+:::
+
+::: {.column width="50%"}
+### Extensions
+
+- Matérn-like copula
+  - Kronecker structure
+  - Flexible correlation
+  - Fast computation
+
+- Parameter modeling
+  - Spatial smoothing
+  - Trend components
+  - Shape constraints
+:::
+:::
+
+::: {style="font-size:65%; margin-top:20px;"}
+**Model Structure**: For locations $i=1,\ldots,p$ and times $t=1,\ldots,n$:
+
+$$
+\begin{aligned}
+Y_{it} &\sim \mathrm{GEV}(\mu_i, \sigma_i, \xi_i) \\
+Z_{it} &= \Phi^{-1}(F_{\mathrm{GEV}}(Y_{it}|\mu_i,\sigma_i,\xi_i)) \\
+Z_t &\sim \mathcal{N}(0, Q^{-1})
+\end{aligned}
+$$
+:::
+
+# References
+
+::: {#refs style="font-size:55%"}
+:::
+
+
