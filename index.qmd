@@ -23,54 +23,88 @@ csl: cambridge-university-press-numeric.csl
 
 ## Extreme Precipitation {data-name="Background"}
 
+::: {.columns}
+::: {.column width="40%"}
+![Reykjavík, 2016 [@mblreykjavik]](images/flod1.jpg){width="100%" fig-align="left" style="font-size:40%"}
 
+![Siglufjörður, 2024 [@ruvsiglufjordur]](images/flod2.webp){width="100%" fig-align="left" style="font-size:40%"}
+:::
+
+::: {.column width="60%" style="font-size: 60%"}
+- **Climate Change Impact**
+  - Increasing frequency of extreme events
+  - Higher intensity precipitation
+  - Sub-daily timescale impacts
+
+- **Modeling Challenges**
+  - Complex spatial dependencies
+  - High-resolution requirements
+  - Non-stationary patterns
+
+- **Research Goals**
+  - Efficient statistical methods
+  - Improved uncertainty quantification
+  - Scalable computational approach
+:::
+:::
 
 ## Large Datasets
 
+::: {.columns style="font-size:70%"}
+::: {.column width="70%"}
+-   UKCP Local Projections on a 5km grid over the UK (1980-2080) [@metoffi]
+-   Challenge: Modeling maximum daily precipitation in yearly blocks
+    -   43,920 spatial locations on a 180 x 244 grid
+    -   Four parameters per location as in [@johannesson2021]
+        -   Location, Trend, Scale, Shape
+-   Two aspects of spatial dependence:
+    1.  GEV parameters (Spatial models)
+    2.  Data-level dependence (Copulas)
+:::
 
+::: {.column width="30%"}
+![](images/ukcp_data.png){width="100%"}
+:::
+:::
 
 ## Max-and-Smooth
 
 ::: {.columns style="font-size:60%"}
-::: {.column width="50%"}
 ### Two-Step Approach
+::: {.column width="50%"}
 
 1. **Max Step**: Maximum Likelihood
-   - Independent local estimates
-   - Gaussian approximation
-   - Observed information matrix
+   - Independent local estimates $\hat{\eta}_i$
+   - Asymptotic normality:
+$$
+\hat{\eta}_i \stackrel{a}{\sim} N(\eta_i, \mathbf{Q}_{\eta y,i}^{-1})
+$$
+   - Observed information matrix $\mathbf{Q}_{\eta y,i} = -\nabla^2\ell_i(\hat{\eta}_i)$
+
+:::
+::: {.column width="50%"}
 
 2. **Smooth Step**: Spatial Model
-   - Latent Gaussian model
-   - Efficient MCMC sampling
-   - Proper uncertainty propagation
-:::
-
-::: {.column width="50%"}
-### Key Properties
-
-- Asymptotic guarantees
-  - Consistent estimates
-  - Normal approximation
-  - Valid inference
-
-- Computational benefits
-  - Parallel processing
-  - Dimension reduction
-  - Sparse operations
+   - Gaussian approximation:
+$$
+\hat{\eta} \mid \eta \sim N(\eta, \mathbf{Q}_{\eta y}^{-1})
+$$
+   - Latent field prior:
+$$
+\eta \mid \theta \sim N(0, \mathbf{Q}_\eta(\theta)^{-1})
+$$
+   - Hyperprior: $p(\theta)$
 :::
 :::
 
 ::: {style="font-size:65%; margin-top:20px;"}
-**General Framework**: For independent groups $i=1,\ldots,G$ with $n_i$ observations:
+**Posterior**: The joint posterior distribution becomes:
 
 $$
-\begin{aligned}
-p(y|\psi) &= \prod_{i=1}^G \prod_{j \in A_i} p(y_{ij}|\psi_i) \\
-g(\psi_i) &= X\beta + Au + \epsilon \\
-u &\sim N(0, Q_u^{-1}), \quad \epsilon \sim N(0, Q_\epsilon^{-1})
-\end{aligned}
+p(\eta, \theta \mid \hat{\eta}) \propto p(\hat{\eta} \mid \eta)p(\eta \mid \theta)p(\theta)
 $$
+
+where $\eta$ is the latent field, $\theta$ are hyperparameters, and $\hat{\eta}$ are the local MLEs.
 :::
 
 ## Spatial Gaussian Copula {data-name="Copula"}
@@ -502,13 +536,79 @@ read_csv(here::here("data", "benchmark_matern_likelihood.csv")) |>
 
 ## Max-and-Smooth
 
+**Some results here (maybe about running time)**
+
 ## Paper 1 {data-name="Future Work"}
+
+::: {.columns style="font-size:60%"}
+::: {.column width="50%"}
+### Theoretical Development
+
+- Novel Matérn-like copula integration
+- Efficient computational methods:
+  - Kronecker sum decomposition
+  - Eigendecomposition techniques
+  - Folded circulant approximations
+:::
+
+::: {.column width="50%"}
+### Key Contributions
+
+- Mathematical framework for spatial extremes
+- Computational efficiency for large grids
+- Theoretical validation through simulation
+- Improved spatial dependence modeling
+:::
+:::
 
 ## Paper 2
 
+::: {.columns style="font-size:60%"}
+::: {.column width="50%"}
+### UKCP Local Projections
+
+- Analysis of 5km grid projections
+- Sub-daily precipitation patterns
+- Comparison with observed data
+- Systematic bias identification
+:::
+
+::: {.column width="50%"}
+### Methodology
+
+- Hierarchical statistical modeling
+- Spatial dependence calibration
+- Uncertainty quantification
+- Improved 21st century projections
+:::
+:::
+
+```{dot}
+//| label: paper2
+//| file: paper2.dot
+```
+
 ## Paper 3
 
+::: {.columns style="font-size:60%"}
+::: {.column width="50%"}
+### R Package Implementation
 
+- Comprehensive software package
+- C++ integration for efficiency
+- Parallel processing capabilities
+- User-friendly interface design
+:::
+
+::: {.column width="50%"}
+### Features
+
+- Documentation and vignettes
+- Example datasets
+- Visualization tools
+- Integration with spatial packages
+:::
+:::
 
 # References
 
