@@ -119,7 +119,7 @@ where $\eta$ is the latent field, $\theta$ are hyperparameters, and $\hat{\eta}$
 
 ::: {.columns style="font-size:60%"}
 $$
-\log f(\mathbf{x}) \propto \frac{1}{2}\left(\log |\mathbf{Q}| - \mathbf{x}^T\mathbf{Q}\mathbf{x}\right)
+\log f(\mathbf{x}) = \frac{1}{2}\left(\log |\mathbf{Q}| - \mathbf{x}^T\mathbf{Q}\mathbf{x}\right) + \mathrm{constant}
 $$
 
 ::: {.column width="50%"}
@@ -224,7 +224,7 @@ $$
 :::
 :::
 
-## From Parameter-level to Data-level Dependence
+## From Data-level Independence to Dependence
 
 ::: {.columns style="font-size:60%"}
 ::: {.column width="50%"}
@@ -272,9 +272,10 @@ $$
 ------------------------------------------------------------------------
 
 ::: columns
-### Marginal CDFs
 
 ::: {.column width="50%"}
+### Marginal CDFs
+
 -   $F_i(x_i)$ is $\mathrm{GEV}(\mu_i, \sigma_i, \xi_i)$
 -   Can model parameter dependence with BYM2
 :::
@@ -361,6 +362,43 @@ $$
 :::
 :::
 
+## Connection to SPDE approach [@lindgren2011]
+
+::: {.columns style="font-size:60%"}
+::: {.column width="50%"}
+- **Continuous SPDE**  
+  A Matérn field $x(\mathbf{s})$ in continuous space is a solution to  
+  $$
+  (\kappa^2 - \Delta)^{\alpha/2}\,x(\mathbf{s}) \;=\; \mathcal{W}(\mathbf{s}),
+  $$
+  where $\Delta = \frac{\partial^2}{\partial x^2} + \frac{\partial^2}{\partial y^2}$ is the Laplacian operator, and $\alpha$ controls smoothness.
+
+  
+:::
+::: {.column width="50%"}
+- **Discretizing on a Regular Grid**  
+  - In 2D, $\Delta$ on a $n_1 \times n_2$ grid becomes a **Kronecker sum** of 1D difference operators:
+    $$
+      \Delta_
+      \;\approx\; 
+      \mathbf{L}_{1D}^{(x)} \otimes \mathbf{I}_{n_2} \;+\; \mathbf{I}_{n_1} \otimes \mathbf{L}_{1D}^{(y)}.
+    $$
+  - $\mathbf{L_{1D}}$ is a second difference matrix
+  $$
+    \mathbf{L}_{1D} = 
+    \begin{bmatrix}
+    -2 & 1 & 0 & \cdots & 0 \\
+    1 & -2 & 1 & \cdots & 0 \\
+    0 & 1 & -2 & \cdots & 0 \\
+    \vdots & \vdots & \vdots & \ddots & \vdots \\
+    0 & 0 & 0 & \cdots & -2
+    \end{bmatrix}
+  $$ 
+:::
+
+:::
+
+
 ## Eigendecomposition
 
 ::: {.columns style="font-size:65%"}
@@ -413,10 +451,13 @@ $$
 \boldsymbol \Sigma_{ii} = \sum_{k=1}^{n} v_{ik} \frac{1}{\lambda_k} (v^T)_{ki} = \sum_{k=1}^{n} v_{ik} \frac{1}{\lambda_k} v_{ik} = \sum_{k=1}^{n} v_{ik}^2 \frac{1}{\lambda_k}
 $$
 
-Compute vector $\boldsymbol \sigma^2$ containing all marginal variances
+Let $\left\{\lambda\right\}_{ij} = \left\{\lambda_{\rho_1}\right\}_i + \left\{\lambda_{\rho_2}\right\}_j$ and $\left\{\mathbf{v}\right\}_{ij} = \left\{\mathbf{v}_{\rho_1}\right\}_i \otimes \left\{\mathbf{v}_{\rho_2}\right\}_j$. Compute vector $\boldsymbol \sigma^2$ containing all marginal variances
 
 $$ 
-\boldsymbol \sigma^2 = \sum_{i = 1}^{n_1} \sum_{j=1}^{n_2} \frac{\left(\left\{\mathbf{v}_{\rho_1}\right\}_i \otimes \left\{\mathbf{v}_{\rho_2}\right\}_j\right)^{2}}{\quad\left(\left\{\lambda_{\rho_1}\right\}_i + \left\{\lambda_{\rho_2}\right\}_j\right)^{\nu+1}}
+\boldsymbol \sigma^2 = \sum_{i = 1}^{n_1} \sum_{j=1}^{n_2} 
+\frac{1}{\left\{\lambda\right\}_{ij}}
+\cdot 
+\left\{\mathbf{v}\right\}_{ij} \odot \left\{\mathbf{v}\right\}_{ij}
 $$
 :::
 
@@ -479,7 +520,7 @@ bench::mark(
 ::: {style="font-size:70%"}
 The Gaussian log pdf is 
 $$
-\log f(\mathbf{u} \vert \mathbf{Q}) \propto \frac{1}{2}\left(\log|\mathbf{Q}| - \mathbf{z}^T\mathbf{Q}\mathbf{z}\right)
+\log f(\mathbf{z} \vert \mathbf{Q}) = \frac{1}{2}\left(\log|\mathbf{Q}| - \mathbf{z}^T\mathbf{Q}\mathbf{z}\right) + \mathrm{constant}
 $$
 
 Without scaling of $\mathbf Q$ we get
@@ -511,7 +552,7 @@ $$
 Then $\widetilde{\mathbf{v}}$ and $\widetilde{\lambda}$ are an eigenvector/value pair of the scaled precision matrix $\mathbf{\widetilde{Q}}$. Iterate over $i$ and $j$ to calculate
 
 $$
-\log c(\mathbf{u} \vert \mathbf{\widetilde{Q}}) = \frac{1}{2}\log|\mathbf{\widetilde Q}| - \frac{1}{2}\mathbf{z}^T\mathbf{\widetilde Q}\mathbf{z} + \frac{1}{2}\mathbf{z}^T\mathbf{z}
+\log c(\mathbf{z} \vert \mathbf{\widetilde{Q}}) = \frac{1}{2}\log|\mathbf{\widetilde Q}| - \frac{1}{2}\mathbf{z}^T\mathbf{\widetilde Q}\mathbf{z} + \frac{1}{2}\mathbf{z}^T\mathbf{z}
 $$
 :::
 
@@ -757,9 +798,23 @@ read_csv(here::here("data", "benchmark_matern_likelihood.csv")) |>
 
 ## Max-and-Smooth
 
-**Some results here (maybe about running time)**
+::: {.columns}
+::: {.column width=50%}
+<br>
+<br>
+
+![](images/post_bym2.png)
+:::
+::: {.column width=50%}
+![](images/comparison.png)
+:::
+:::
+
+
 
 ## Paper 1 {data-name="Future Work"}
+
+#### **Matérn-like Copula and Max-and-Smooth**
 
 ::: {.columns style="font-size:60%"}
 ::: {.column width="50%"}
@@ -783,6 +838,8 @@ read_csv(here::here("data", "benchmark_matern_likelihood.csv")) |>
 :::
 
 ## Paper 2
+
+#### **Recalibration of Projections with Latent Bayeslinear Method**
 
 ::: {.columns style="font-size:60%; margin-bottom:0px; padding-bottom:0px;"}
 ::: {.column width="50%"}
@@ -812,6 +869,8 @@ read_csv(here::here("data", "benchmark_matern_likelihood.csv")) |>
 :::
 
 ## Paper 3
+
+#### **Manuscript on R Package**
 
 ::: {.columns style="font-size:60%"}
 ::: {.column width="50%"}

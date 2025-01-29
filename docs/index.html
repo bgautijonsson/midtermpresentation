@@ -332,7 +332,7 @@ p(\eta, \theta \mid \hat{\eta}) \propto p(\hat{\eta} \mid \eta)p(\eta \mid \thet
 <h2>Calculating Multivariate Normal Densities</h2>
 <div class="columns" style="font-size:60%">
 <p><span class="math display">\[
-\log f(\mathbf{x}) \propto \frac{1}{2}\left(\log |\mathbf{Q}| - \mathbf{x}^T\mathbf{Q}\mathbf{x}\right)
+\log f(\mathbf{x}) = \frac{1}{2}\left(\log |\mathbf{Q}| - \mathbf{x}^T\mathbf{Q}\mathbf{x}\right) + \mathrm{constant}
 \]</span></p><div class="column" style="width:50%;">
 <h3 id="computational-challenges">Computational challenges</h3>
 <ol type="1">
@@ -424,8 +424,8 @@ p(\eta, \theta \mid \hat{\eta}) \propto p(\hat{\eta} \mid \eta)p(\eta \mid \thet
 </div></div>
 </div>
 </section>
-<section id="from-parameter-level-to-data-level-dependence" class="slide level2">
-<h2>From Parameter-level to Data-level Dependence</h2>
+<section id="from-data-level-independence-to-dependence" class="slide level2">
+<h2>From Data-level Independence to Dependence</h2>
 <div class="columns" style="font-size:60%">
 <div class="column" style="width:50%;">
 <h3 id="parameter-level-dependence">Parameter-level Dependence</h3>
@@ -463,8 +463,8 @@ h(x) = c(F_1(x_1), \dots, F_d(x_d)) \prod_{i=1}^d f_i(x_i)
 \]</span></p>
 <hr>
 <div class="columns">
-<h3 id="marginal-cdfs">Marginal CDFs</h3>
 <div class="column" style="width:50%;">
+<h3 id="marginal-cdfs">Marginal CDFs</h3>
 <ul>
 <li><span class="math inline">\(F_i(x_i)\)</span> is <span class="math inline">\(\mathrm{GEV}(\mu_i, \sigma_i, \xi_i)\)</span></li>
 <li>Can model parameter dependence with BYM2</li>
@@ -540,6 +540,40 @@ u_i &amp;= F_{\mathrm{GEV}}(x_i \vert \mu_i, \sigma_i, \xi_i)
 </div>
 </div>
 </section>
+<section id="connection-to-spde-approach-lindgren2011" class="slide level2">
+<h2>Connection to SPDE approach <span class="citation" data-cites="lindgren2011">[<a href="#/references" role="doc-biblioref" onclick="">11</a>]</span></h2>
+<div class="columns" style="font-size:60%">
+<div class="column" style="width:50%;">
+<ul>
+<li><strong>Continuous SPDE</strong><br>
+A Matérn field <span class="math inline">\(x(\mathbf{s})\)</span> in continuous space is a solution to<br>
+<span class="math display">\[
+(\kappa^2 - \Delta)^{\alpha/2}\,x(\mathbf{s}) \;=\; \mathcal{W}(\mathbf{s}),
+\]</span> where <span class="math inline">\(\Delta = \frac{\partial^2}{\partial x^2} + \frac{\partial^2}{\partial y^2}\)</span> is the Laplacian operator, and <span class="math inline">\(\alpha\)</span> controls smoothness.</li>
+</ul>
+</div><div class="column" style="width:50%;">
+<ul>
+<li><strong>Discretizing on a Regular Grid</strong>
+<ul>
+<li>In 2D, <span class="math inline">\(\Delta\)</span> on a <span class="math inline">\(n_1 \times n_2\)</span> grid becomes a <strong>Kronecker sum</strong> of 1D difference operators: <span class="math display">\[
+  \Delta_
+  \;\approx\;
+  \mathbf{L}_{1D}^{(x)} \otimes \mathbf{I}_{n_2} \;+\; \mathbf{I}_{n_1} \otimes \mathbf{L}_{1D}^{(y)}.
+\]</span></li>
+<li><span class="math inline">\(\mathbf{L_{1D}}\)</span> is a second difference matrix <span class="math display">\[
+\mathbf{L}_{1D} =
+\begin{bmatrix}
+-2 &amp; 1 &amp; 0 &amp; \cdots &amp; 0 \\
+1 &amp; -2 &amp; 1 &amp; \cdots &amp; 0 \\
+0 &amp; 1 &amp; -2 &amp; \cdots &amp; 0 \\
+\vdots &amp; \vdots &amp; \vdots &amp; \ddots &amp; \vdots \\
+0 &amp; 0 &amp; 0 &amp; \cdots &amp; -2
+\end{bmatrix}
+\]</span></li>
+</ul></li>
+</ul>
+</div></div>
+</section>
 <section id="eigendecomposition" class="slide level2">
 <h2>Eigendecomposition</h2>
 <div class="columns" style="font-size:65%">
@@ -577,9 +611,12 @@ u_i &amp;= F_{\mathrm{GEV}}(x_i \vert \mu_i, \sigma_i, \xi_i)
 <p><span class="math display">\[
 \boldsymbol \Sigma_{ii} = \sum_{k=1}^{n} v_{ik} \frac{1}{\lambda_k} (v^T)_{ki} = \sum_{k=1}^{n} v_{ik} \frac{1}{\lambda_k} v_{ik} = \sum_{k=1}^{n} v_{ik}^2 \frac{1}{\lambda_k}
 \]</span></p>
-<p>Compute vector <span class="math inline">\(\boldsymbol \sigma^2\)</span> containing all marginal variances</p>
+<p>Let <span class="math inline">\(\left\{\lambda\right\}_{ij} = \left\{\lambda_{\rho_1}\right\}_i + \left\{\lambda_{\rho_2}\right\}_j\)</span> and <span class="math inline">\(\left\{\mathbf{v}\right\}_{ij} = \left\{\mathbf{v}_{\rho_1}\right\}_i \otimes \left\{\mathbf{v}_{\rho_2}\right\}_j\)</span>. Compute vector <span class="math inline">\(\boldsymbol \sigma^2\)</span> containing all marginal variances</p>
 <p><span class="math display">\[
-\boldsymbol \sigma^2 = \sum_{i = 1}^{n_1} \sum_{j=1}^{n_2} \frac{\left(\left\{\mathbf{v}_{\rho_1}\right\}_i \otimes \left\{\mathbf{v}_{\rho_2}\right\}_j\right)^{2}}{\quad\left(\left\{\lambda_{\rho_1}\right\}_i + \left\{\lambda_{\rho_2}\right\}_j\right)^{\nu+1}}
+\boldsymbol \sigma^2 = \sum_{i = 1}^{n_1} \sum_{j=1}^{n_2}
+\frac{1}{\left\{\lambda\right\}_{ij}}
+\cdot
+\left\{\mathbf{v}\right\}_{ij} \odot \left\{\mathbf{v}\right\}_{ij}
 \]</span></p>
 </div>
 </section>
@@ -641,7 +678,7 @@ u_i &amp;= F_{\mathrm{GEV}}(x_i \vert \mu_i, \sigma_i, \xi_i)
 <h2>Calculating the (non-copula) density</h2>
 <div style="font-size:70%">
 <p>The Gaussian log pdf is <span class="math display">\[
-\log f(\mathbf{u} \vert \mathbf{Q}) \propto \frac{1}{2}\left(\log|\mathbf{Q}| - \mathbf{z}^T\mathbf{Q}\mathbf{z}\right)
+\log f(\mathbf{z} \vert \mathbf{Q}) = \frac{1}{2}\left(\log|\mathbf{Q}| - \mathbf{z}^T\mathbf{Q}\mathbf{z}\right) + \mathrm{constant}
 \]</span></p>
 <p>Without scaling of <span class="math inline">\(\mathbf Q\)</span> we get</p>
 <p><span class="math display">\[
@@ -667,7 +704,7 @@ u_i &amp;= F_{\mathrm{GEV}}(x_i \vert \mu_i, \sigma_i, \xi_i)
 \]</span></p>
 <p>Then <span class="math inline">\(\widetilde{\mathbf{v}}\)</span> and <span class="math inline">\(\widetilde{\lambda}\)</span> are an eigenvector/value pair of the scaled precision matrix <span class="math inline">\(\mathbf{\widetilde{Q}}\)</span>. Iterate over <span class="math inline">\(i\)</span> and <span class="math inline">\(j\)</span> to calculate</p>
 <p><span class="math display">\[
-\log c(\mathbf{u} \vert \mathbf{\widetilde{Q}}) = \frac{1}{2}\log|\mathbf{\widetilde Q}| - \frac{1}{2}\mathbf{z}^T\mathbf{\widetilde Q}\mathbf{z} + \frac{1}{2}\mathbf{z}^T\mathbf{z}
+\log c(\mathbf{z} \vert \mathbf{\widetilde{Q}}) = \frac{1}{2}\log|\mathbf{\widetilde Q}| - \frac{1}{2}\mathbf{z}^T\mathbf{\widetilde Q}\mathbf{z} + \frac{1}{2}\mathbf{z}^T\mathbf{z}
 \]</span></p>
 </div>
 </section>
@@ -1947,10 +1984,17 @@ Folded
 </section>
 <section id="max-and-smooth-1" class="slide level2">
 <h2>Max-and-Smooth</h2>
-<p><strong>Some results here (maybe about running time)</strong></p>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><br> <br></p>
+<p><img data-src="images/post_bym2.png"></p>
+</div><div class="column" style="width:50%;">
+<p><img data-src="images/comparison.png"></p>
+</div></div>
 </section>
 <section id="paper-1" class="slide level2" data-name="Future Work">
 <h2>Paper 1</h2>
+<h4 id="matérn-like-copula-and-max-and-smooth"><strong>Matérn-like Copula and Max-and-Smooth</strong></h4>
 <div class="columns" style="font-size:60%">
 <div class="column" style="width:50%;">
 <h3 id="theoretical-development">Theoretical Development</h3>
@@ -1975,6 +2019,7 @@ Folded
 </section>
 <section id="paper-2" class="slide level2">
 <h2>Paper 2</h2>
+<h4 id="recalibration-of-projections-with-latent-bayeslinear-method"><strong>Recalibration of Projections with Latent Bayeslinear Method</strong></h4>
 <div class="columns" style="font-size:60%; margin-bottom:0px; padding-bottom:0px;">
 <div class="column" style="width:50%;">
 <h3 id="ukcp-local-projections">UKCP Local Projections</h3>
@@ -2132,6 +2177,7 @@ Folded
 </section>
 <section id="paper-3" class="slide level2">
 <h2>Paper 3</h2>
+<h4 id="manuscript-on-r-package"><strong>Manuscript on R Package</strong></h4>
 <div class="columns" style="font-size:60%">
 <div class="column" style="width:50%;">
 <h3 id="r-package-implementation">R Package Implementation</h3>
