@@ -21,28 +21,59 @@ bibliography: references.bib
 csl: cambridge-university-press-numeric.csl
 ---
 
-## Introduction {data-name="Background"}
+## Extreme Precipitation {data-name="Background"}
 
 
 
-## Data 
+## Large Datasets
 
-::: {.columns style="font-size:70%"}
-::: {.column width="70%"}
--   UKCP Local Projections on a 5km grid over the UK (1980-2080) [@metoffi]
--   Challenge: Modeling maximum daily precipitation in yearly blocks
-    -   43,920 spatial locations on a 180 x 244 grid
-    -   Four parameters per location as in [@johannesson2021]
-        -   Location, Trend, Scale, Shape
--   Two aspects of spatial dependence:
-    1.  GEV parameters (ICAR models)
-    2.  Data-level dependence (Copulas)
+
+
+## Max-and-Smooth
+
+::: {.columns style="font-size:60%"}
+::: {.column width="50%"}
+### Two-Step Approach
+
+1. **Max Step**: Maximum Likelihood
+   - Independent local estimates
+   - Gaussian approximation
+   - Observed information matrix
+
+2. **Smooth Step**: Spatial Model
+   - Latent Gaussian model
+   - Efficient MCMC sampling
+   - Proper uncertainty propagation
 :::
 
-::: {.column width="30%"}
-![](images/ukcp_data.png){width="100%"}
+::: {.column width="50%"}
+### Key Properties
+
+- Asymptotic guarantees
+  - Consistent estimates
+  - Normal approximation
+  - Valid inference
+
+- Computational benefits
+  - Parallel processing
+  - Dimension reduction
+  - Sparse operations
 :::
 :::
+
+::: {style="font-size:65%; margin-top:20px;"}
+**General Framework**: For independent groups $i=1,\ldots,G$ with $n_i$ observations:
+
+$$
+\begin{aligned}
+p(y|\psi) &= \prod_{i=1}^G \prod_{j \in A_i} p(y_{ij}|\psi_i) \\
+g(\psi_i) &= X\beta + Au + \epsilon \\
+u &\sim N(0, Q_u^{-1}), \quad \epsilon \sim N(0, Q_\epsilon^{-1})
+\end{aligned}
+$$
+:::
+
+## Spatial Gaussian Copula {data-name="Copula"}
 
 ## Calculating Multivariate Normal Densities
 
@@ -188,7 +219,7 @@ $$
 
 :::
 
-## Our Approach: Matérn-like Gaussian Copula
+## Matérn-like Gaussian Copula
 
 ::: {style="font-size:55%"}
 
@@ -243,7 +274,7 @@ $$
 :::
 :::
 
-## The Precision Matrix {data-name="Methods"}
+## The Precision Matrix
 
 ::: {style="font-size:60%"}
 $\mathbf Q$ defined as Kronecker sum of two AR(1) precision matrices, similar to [@lindgren2011]
@@ -349,97 +380,133 @@ $$
 $$
 :::
 
-## Max-and-Smooth: Theory
+## Max-step: IID Case {data-name="Max-and-Smooth"}
 
-::: {.columns style="font-size:60%"}
-::: {.column width="50%"}
-### Two-Step Approach
+::: {style="font-size:65%;"}
+* $P$: number of stations, $N$: replicates at each station
 
-1. **Max Step**: Maximum Likelihood
-   - Independent local estimates
-   - Gaussian approximation
-   - Observed information matrix
-
-2. **Smooth Step**: Spatial Model
-   - Latent Gaussian model
-   - Efficient MCMC sampling
-   - Proper uncertainty propagation
-:::
-
-::: {.column width="50%"}
-### Key Properties
-
-- Asymptotic guarantees
-  - Consistent estimates
-  - Normal approximation
-  - Valid inference
-
-- Computational benefits
-  - Parallel processing
-  - Dimension reduction
-  - Sparse operations
-:::
-:::
-
-::: {style="font-size:65%; margin-top:20px;"}
-**General Framework**: For independent groups $i=1,\ldots,G$ with $n_i$ observations:
+**Independent Likelihood**: Marginal GEV distributions:
 
 $$
-\begin{aligned}
-p(y|\psi) &= \prod_{i=1}^G \prod_{j \in A_i} p(y_{ij}|\psi_i) \\
-g(\psi_i) &= X\beta + Au + \epsilon \\
-u &\sim N(0, Q_u^{-1}), \quad \epsilon \sim N(0, Q_\epsilon^{-1})
-\end{aligned}
+\ell(\theta|Y) = \sum_{i=1}^P \ell_{\text{GEV}}(Y_{i}|\mu_i,\sigma_i,\xi_i) =
+\sum_{i=1}^P \sum_{j=1}^N \ell_{\text{GEV}}(Y_{ij}|\mu_i,\sigma_i,\xi_i)
 $$
+
+**Multivariate Link Function**:
+$$
+\mu = e^\psi, \quad \sigma = e^{\psi + \tau}, \quad \xi = g(\phi)
+$$
+
+**Key Properties**:
+
+- $\mathbf Q_{\eta y}$ is a banded matrix
+- Parallel processing using L-BFGS with automatic differentiation
+- Weak normal priors on transformed parameters
+
 :::
 
-## Max-and-Smooth: Our Application {data-name="Methods"}
+## Max-step: Adding Dependence
 
-::: {.columns style="font-size:60%"}
-::: {.column width="50%"}
-### Implementation
-
-1. **Max Step**: GEV Parameters
-   - Local parameter estimates
-   - Copula dependence structure
-   - Hessian for uncertainty
-
-2. **Smooth Step**: BYM2 Model
-   - Separate models per parameter
-   - Stan implementation
-   - Efficient sparse operations
-:::
-
-::: {.column width="50%"}
-### Extensions
-
-- Matérn-like copula
-  - Kronecker structure
-  - Flexible correlation
-  - Fast computation
-
-- Parameter modeling
-  - Spatial smoothing
-  - Trend components
-  - Shape constraints
-:::
-:::
-
-::: {style="font-size:65%; margin-top:20px;"}
-**Model Structure**: For locations $i=1,\ldots,p$ and times $t=1,\ldots,n$:
+::: {style="font-size:65%;"}
+**Combined Likelihood**: Added Matérn-like Gaussian copula:
 
 $$
-\begin{aligned}
-Y_{it} &\sim \mathrm{GEV}(\mu_i, \sigma_i, \xi_i) \\
-Z_{it} &= \Phi^{-1}(F_{\mathrm{GEV}}(Y_{it}|\mu_i,\sigma_i,\xi_i)) \\
-Z_t &\sim \mathcal{N}(0, Q^{-1})
-\end{aligned}
+\begin{gathered}
+\ell(\theta|Y) = \sum_{j=1}^N \left[\sum_{i=1}^P \ell_{\text{GEV}}(Y_{ij}|\mu_i,\sigma_i,\xi_i) + \frac{1}{2}\left(\log|\mathbf{Q}| - Z_j^T\mathbf{Q}Z_j + Z_j^TZ_j\right) \right], \\
+Z_j = \Phi^{-1}(U_j), \qquad
+U_{ij} = F_\mathrm{GEV}(Y_{ij} \vert \mu_i, \sigma_i, \xi_i)
+\end{gathered}
 $$
+
+**Key Changes**:
+
+- $\mathbf Q_{\eta y}$ structure based on $\nu$, smoothness in the copula
+- Parallel processing of replicates instead of stations
+- $\mathbf Q$ assumed known
+- Copula likelihood calculated using sparse representation of $L$
+- Acklam's Algorithm for $\Phi^{-1}$ [@AcklamInvNorm]
+
 :::
+
+## Smooth-step
+
+::: {style="font-size:65%;"}
+
+**Gaussian Approximation**: Based on sparse Cholesky factor, $L$, of $Q_{\eta y}$
+
+$$
+\log p(\hat\eta \mid \eta, L) = \frac{1}{2}\log|Q_{\eta y}| - \frac{1}{2}\left\|\left(\sum_{j=1}^{n_i} L_{ij}(\hat\eta_{k_{ij}} - \eta_{k_{ij}})\right)_{i=1}^n\right\|^2
+$$
+
+**Spatial Prior**: BYM2 [@riebler2016; @simpson2015] model for each GEV parameter $k$
+
+$$
+\eta_k = \mu_k\mathbf{1} + \sigma_k(\sqrt{\rho_k/c} \cdot \eta^{\mathrm{spatial}}_k + \sqrt{1-\rho_k}\cdot\eta^{\mathrm{random}}_k),
+$$
+
+where $c$ is a scaling factor chosen so $E_{\mathrm{geo}}\left[\mathrm{Var}(\eta^{\text{spatial}}_k)\right] = 1$
+
+**Prior Specifications**:
+
+- $\eta^{\text{spatial}}_k \sim \text{ICAR}$ [@besag1991] with sum-to-zero constraint
+- $\eta^{\text{random}}_k \sim N(0,1)$
+- $\sigma_k \sim \text{Exp}(1)$
+- $\rho_k \sim \text{Beta}(1,1)$
+
+
+:::
+
+## Gaussian Copula {data-name="Results"}
+
+```{r}
+library(gt)
+library(readr)
+read_csv(here::here("data", "benchmark_matern_likelihood.csv")) |> 
+  gt() |> 
+  cols_label(
+    `Cholesky (Unscaled)` = "Cholesky",
+    `Eigen (Unscaled)` = "Time",
+    eig = "Eigen",
+    sp_3 = "Relative",
+    circ = "Time",
+    sp_1 = "Relative",
+    fol = "Time",
+    sp_2 = "Relative"
+  ) |> 
+  tab_spanner(
+    label = "Circulant",
+    columns = 6:7
+  ) |> 
+  tab_spanner(
+    label = "Folded",
+    columns = 8:9
+  ) |> 
+  tab_spanner(
+    label = "Eigen",
+    columns = 3:4
+  ) |> 
+  tab_spanner(
+    label = "Unscaled",
+    2:4
+  ) |> 
+  tab_spanner(
+    label = "Scaled",
+    columns = 5:9
+  ) |> 
+  tab_caption(
+    md("Benchmarking how long it takes to evaluate the density of a Mátern(&#x3BD;)-like field with correlation parameter &#x3C1;, either unscaled or scaled to have unit marginal variance")
+  )  |> 
+  opt_row_striping(TRUE)
+
+```
+
+## Max-and-Smooth
+
+## Future Work {data-nem="Future Work"}
+
+
 
 # References
 
 ::: {#refs style="font-size:55%"}
 :::
-
-

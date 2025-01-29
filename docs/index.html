@@ -163,287 +163,14 @@ Brynjólfur Gauti Guðrúnar Jónsson
 </div>
 
 </section>
-<section id="introduction" class="slide level2" data-name="Background">
-<h2>Introduction</h2>
-<div class="columns" style="font-size:70%">
-<div class="column" style="width:70%;">
-<ul>
-<li>UKCP Local Projections on a 5km grid over the UK (1980-2080) <span class="citation" data-cites="metoffi">[<a href="#/references" role="doc-biblioref" onclick="">1</a>]</span></li>
-<li>Challenge: Modeling maximum daily precipitation in yearly blocks
-<ul>
-<li>43,920 spatial locations on a 180 x 244 grid</li>
-<li>Four parameters per location as in <span class="citation" data-cites="johannesson2021">[<a href="#/references" role="doc-biblioref" onclick="">2</a>]</span>
-<ul>
-<li>Location, Trend, Scale, Shape</li>
-</ul></li>
-</ul></li>
-<li>Two aspects of spatial dependence:
-<ol type="1">
-<li>GEV parameters (ICAR models)</li>
-<li>Data-level dependence (Copulas)</li>
-</ol></li>
-</ul>
-</div><div class="column" style="width:30%;">
-<p><img data-src="images/ukcp_data.png" style="width:100.0%"></p>
-</div></div>
+<section id="extreme-precipitation" class="slide level2" data-name="Background">
+<h2>Extreme Precipitation</h2>
 </section>
-<section id="calculating-multivariate-normal-densities" class="slide level2">
-<h2>Calculating Multivariate Normal Densities</h2>
-<div class="columns" style="font-size:60%">
-<p><span class="math display">\[
-\log f(\mathbf{x}) \propto \frac{1}{2}\left(\log |\mathbf{Q}| - \mathbf{x}^T\mathbf{Q}\mathbf{x}\right)
-\]</span></p><div class="column" style="width:50%;">
-<h3 id="computational-challenges">Computational challenges</h3>
-<ol type="1">
-<li><strong>Log Determinant</strong>: <span class="math inline">\(\log |\mathbf{Q}|\)</span>
-<ul>
-<li>Constant for a given precision matrix</li>
-</ul></li>
-<li><strong>Quadratic Form</strong>: <span class="math inline">\(\mathbf{x}^T\mathbf{Q}\mathbf{x}\)</span>
-<ul>
-<li>Needs calculation for each density evaluation</li>
-</ul></li>
-</ol>
-</div><div class="column" style="width:50%;">
-<h3 id="spatial-model-considerations">Spatial Model Considerations</h3>
-<ul>
-<li>Some models (e.g., ICAR) avoid log determinant calculation</li>
-<li>Efficient computation crucial for large-scale applications</li>
-<li>Fast algorithms when <span class="math inline">\(\mathbf{Q}\)</span> is sparse <span class="citation" data-cites="rue2001 rue2005">[<a href="#/references" role="doc-biblioref" onclick="">3</a>–<a href="#/references" role="doc-biblioref" onclick="">4</a>]</span></li>
-</ul>
-</div></div>
+<section id="large-datasets" class="slide level2">
+<h2>Large Datasets</h2>
 </section>
-<section id="spatial-models" class="slide level2">
-<h2>Spatial Models</h2>
-<div style="font-size:50%">
-<h4 id="conditional-autoregression-car-besag1974">Conditional Autoregression (CAR) <span class="citation" data-cites="besag1974">[<a href="#/references" role="doc-biblioref" onclick="">5</a>]</span></h4>
-<div class="columns">
-<div class="column" style="width:50%;">
-<ul>
-<li><span class="math inline">\(\mathbf{D}\)</span> is a diagonal matrix with <span class="math inline">\(D_{ii} = n_i\)</span>, the number of neighbours of <span class="math inline">\(i\)</span></li>
-<li><span class="math inline">\(\mathbf{A}\)</span> is the adjacency matrix with <span class="math inline">\(A_{ij} = A_{ji} = 1\)</span> if <span class="math inline">\(i \sim j\)</span></li>
-</ul>
-</div><div class="column" style="width:50%;">
-<p><span class="math display">\[
-\begin{aligned}
-\mathbf{x} &amp;\sim N(\mathbf{0}, \tau \mathbf{Q}) \\
-\mathbf{Q} &amp;= \mathbf{D}\left(\mathbf{I} - \alpha \mathbf{A} \right)
-\end{aligned}
-\]</span></p>
-</div></div>
-<hr>
-<h4 id="intrinsic-conditional-autoregression-icar-besag1991">Intrinsic Conditional Autoregression (ICAR) <span class="citation" data-cites="besag1991">[<a href="#/references" role="doc-biblioref" onclick="">6</a>]</span></h4>
-<div class="columns">
-<div class="column" style="width:50%;">
-<ul>
-<li><span class="math inline">\(\alpha = 1\)</span>, so <span class="math inline">\(\mathbf Q\)</span> is singular, but constant</li>
-<li>Don’t have to calculate <span class="math inline">\(\log |\mathbf{Q}|\)</span></li>
-</ul>
-</div><div class="column" style="width:50%;">
-<p><span class="math display">\[
-\begin{aligned}
-\mathbf{x} &amp;\sim N(\mathbf{0}, \tau \mathbf{Q}) \\
-\mathbf{Q} &amp;= \mathbf{D} - \mathbf{A}
-\end{aligned}
-\]</span></p>
-</div></div>
-<hr>
-<div class="columns">
-<div class="column" style="width:50%;">
-<h4 id="bym-besag-york-mollié-model-besag1991">BYM (Besag-York-Mollié) Model <span class="citation" data-cites="besag1991">[<a href="#/references" role="doc-biblioref" onclick="">6</a>]</span></h4>
-<ul>
-<li><span class="math inline">\(\mathbf{u}\)</span> is the structured spatial component (Besag model)</li>
-<li><span class="math inline">\(\mathbf{v}\)</span> is the unstructured component (i.i.d. normal)</li>
-</ul>
-</div><div class="column" style="width:50%;">
-<p><span class="math display">\[
-\begin{aligned}
-\mathbf{x} &amp;= \mathbf{u} + \mathbf{v} \\
-\mathbf{u} &amp;\sim \mathrm{ICAR}(\tau_u) \\
-\mathbf{v} &amp;\sim N(\mathbf{0}, \tau_v^{-1})
-\end{aligned}
-\]</span></p>
-</div></div>
-<hr>
-<div class="columns">
-<div class="column" style="width:50%;">
-<h4 id="bym2-model-riebler2016-simpson2015">BYM2 Model <span class="citation" data-cites="riebler2016 simpson2015">[<a href="#/references" role="doc-biblioref" onclick="">7</a>–<a href="#/references" role="doc-biblioref" onclick="">8</a>]</span></h4>
-<ul>
-<li><span class="math inline">\(\rho\)</span> models how much of variance is spatial</li>
-<li><span class="math inline">\(s\)</span> is a scaling factor chosen to make <span class="math inline">\(\mathrm{Var}(\mathbf u_i) \approx 1\)</span></li>
-</ul>
-</div><div class="column" style="width:50%;">
-<p><span class="math display">\[
-\begin{aligned}
-\mathbf{x} &amp;= \left(\left(\sqrt{\rho/s}\right)\mathbf{u} + \left(\sqrt{1 - \rho}\right) \mathbf{v} \right)\sigma \\
-\mathbf{u} &amp;\sim \mathrm{ICAR}(1) \\
-\mathbf{v} &amp;\sim N(\mathbf{0}, n)
-\end{aligned}
-\]</span></p>
-</div></div>
-</div>
-</section>
-<section id="from-parameter-level-to-data-level-dependence" class="slide level2">
-<h2>From Parameter-level to Data-level Dependence</h2>
-<div class="columns" style="font-size:60%">
-<div class="column" style="width:50%;">
-<h3 id="parameter-level-dependence">Parameter-level Dependence</h3>
-<ul>
-<li>Assumes conditional independence</li>
-<li>Biased joint probability estimates</li>
-<li>Underestimates parameter variance</li>
-</ul>
-</div><div class="column" style="width:50%;">
-<h3 id="copula">Copula</h3>
-<ul>
-<li>Improves joint probabilities</li>
-<li>Enhances spatial risk assessment</li>
-<li>Better variance estimates</li>
-</ul>
-</div></div>
-<div style="font-size:65%; margin-top:20px;">
-<p><strong>Sklar’s Theorem</strong>: For any multivariate distribution <span class="math inline">\(H\)</span>, there exists a unique copula <span class="math inline">\(C\)</span> such that:</p>
-<p><span class="math display">\[
-H(\mathbf x) = C(F_1(x_1), \dots, F_d(x_d))
-\]</span></p>
-<p>where <span class="math inline">\(F_i\)</span> are marginal distributions. We can also write this as a density</p>
-<p><span class="math display">\[
-h(x) = c(F_1(x_1), \dots, F_d(x_d)) \prod_{i=1}^d f_i(x_i)
-\]</span></p>
-</div>
-</section>
-<section id="our-approach-matérn-like-gaussian-copula" class="slide level2">
-<h2>Our Approach: Matérn-like Gaussian Copula</h2>
-<div style="font-size:55%">
-<p><span class="math display">\[
-\begin{gathered}
-\log h(\mathbf x) = \log c\left(F_1(x_1), \dots, F_d(x_d)\right) + \sum_{i=1}^d \log f_i(x_i)
-\end{gathered}
-\]</span></p>
-<hr>
-<div class="columns">
-<h3 id="marginal-cdfs">Marginal CDFs</h3>
-<div class="column" style="width:50%;">
-<ul>
-<li><span class="math inline">\(F_i(x_i)\)</span> is <span class="math inline">\(\mathrm{GEV}(\mu_i, \sigma_i, \xi_i)\)</span></li>
-<li>Can model parameter dependence with BYM2</li>
-</ul>
-</div><div class="column" style="width:50%;">
-<p><span class="math display">\[
-\begin{aligned}
-\log h(\mathbf x) &amp;= \log c(u_1, \dots, u_d) \\
-&amp;+ \sum_{i=1}^d \log f_{\mathrm{GEV}}(x_i \vert \mu_i, \sigma_i, \xi_i) \\
-u_i &amp;= F_{\mathrm{GEV}}(x_i \vert \mu_i, \sigma_i, \xi_i)
-\end{aligned}
-\]</span></p>
-</div></div>
-<hr>
-<div class="columns">
-<h3 id="gaussian-copula">Gaussian Copula</h3>
-<div class="column" style="width:50%;">
-<ul>
-<li>Matérn-like precision matrix <span class="math inline">\(\mathbf{Q}\)</span> <span class="citation" data-cites="lindgren2011">[<a href="#/references" role="doc-biblioref" onclick="">9</a>]</span></li>
-<li>If <span class="math inline">\(\mathbf{Q} = \mathbf{I}\)</span> simplifies to independent margins</li>
-<li>Scaled so <span class="math inline">\(\boldsymbol{\Sigma} = \mathbf{Q}^{-1}\)</span> is correlation matrix</li>
-<li>Need to calculate marginal variances <span class="citation" data-cites="rue2005a rue2007 rue2009">[<a href="#/references" role="doc-biblioref" onclick="">10</a>–<a href="#/references" role="doc-biblioref" onclick="">12</a>]</span></li>
-<li>How to generate, scale and compute with <span class="math inline">\(\mathbf{Q}\)</span> quickly (for MCMC)?</li>
-</ul>
-</div><div class="column" style="width:50%;">
-<p><span class="math display">\[
-\begin{aligned}
-\log c(\mathbf u) &amp;\propto \frac{1}{2}\left(\log |\mathbf{Q}| - \mathbf{z}^T\mathbf{Q}\mathbf{z} + \mathbf{z}^T\mathbf{z}\right) \\
-\mathbf{z} &amp;= \Phi^{-1}(\mathbf u)
-\end{aligned}
-\]</span></p>
-</div></div>
-</div>
-</section>
-<section id="the-precision-matrix" class="slide level2" data-name="Methods">
-<h2>The Precision Matrix</h2>
-<div style="font-size:60%">
-<p><span class="math inline">\(\mathbf Q\)</span> defined as Kronecker sum of two AR(1) precision matrices, similar to <span class="citation" data-cites="lindgren2011">[<a href="#/references" role="doc-biblioref" onclick="">9</a>]</span></p>
-<p><span class="math display">\[
-\mathbf{Q} = \left( \mathbf{Q}_{\rho_1} \otimes \mathbf{I_{n_2}} + \mathbf{I_{n_1}} \otimes \mathbf{Q}_{\rho_2} \right)^{\nu + 1}, \quad \nu \in \{0, 1, 2\}
-\]</span></p>
-<div class="columns" style="font-size:80%">
-<div class="column" style="width:50%;">
-<p><span class="math display">\[
-\mathbf{Q}_{\rho_{1}} = \frac{1}{1-\rho_{1}^2}
-\begin{bmatrix}
-1 &amp; -\rho_{1} &amp; 0 &amp; \cdots &amp; 0 \\
--\rho_{1} &amp; 1+\rho_{1}^2 &amp; -\rho_{1} &amp; \cdots &amp; 0 \\
-0 &amp; -\rho_{1} &amp; 1+\rho_{1}^2 &amp; \cdots &amp; 0 \\
-\vdots &amp; \vdots &amp; \vdots &amp; \ddots &amp; \vdots \\
-0 &amp; 0 &amp; 0 &amp; \cdots &amp; 1
-\end{bmatrix}
-\]</span></p>
-</div><div class="column" style="width:50%;">
-<p><span class="math display">\[
-\mathbf{Q}_{\rho_{2}} = \frac{1}{1-\rho_{2}^2}
-\begin{bmatrix}
-1 &amp; -\rho_{2} &amp; 0 &amp; \cdots &amp; 0 \\
--\rho_{2} &amp; 1+\rho_{2}^2 &amp; -\rho_{2} &amp; \cdots &amp; 0 \\
-0 &amp; -\rho_{2} &amp; 1+\rho_{2}^2 &amp; \cdots &amp; 0 \\
-\vdots &amp; \vdots &amp; \vdots &amp; \ddots &amp; \vdots \\
-0 &amp; 0 &amp; 0 &amp; \cdots &amp; 1
-\end{bmatrix}
-\]</span></p>
-</div><p><span class="math display">\[
-\mathbf Q = \begin{bmatrix}
-\frac{1}{(1-\rho_1^2)}\mathbf{I_{n_2}} + \mathbf{Q_{\rho_2}} &amp; \frac{-\rho_1}{(1-\rho_1^2)}\mathbf{I_{n_2}} &amp; \dots &amp; \cdots &amp; \dots \\
-\frac{-\rho_1}{(1-\rho_1^2)}\mathbf{I_{n_2}} &amp; \frac{(1+\rho_1^2)}{(1-\rho_1^2)}\mathbf{I_{n_2}} + \mathbf{Q_{\rho_2}} &amp; \frac{-\rho_1}{(1-\rho_1^2)} \mathbf{I_{n_2}} &amp; \cdots &amp; \vdots  \\
-\vdots &amp; \ddots &amp; \ddots &amp; \ddots &amp; \vdots \\
-\dots &amp; \dots &amp; \cdots &amp; \frac{-\rho_1}{(1-\rho_1^2)} \mathbf{I_{n_2}} &amp; \frac{1}{(1-\rho_1^2)}\mathbf{I_{n_2}} + \mathbf{Q_{\rho_2}}
-\end{bmatrix}^{\nu + 1}
-\]</span></p>
-</div>
-</div>
-</section>
-<section id="eigendecomposition" class="slide level2">
-<h2>Eigendecomposition</h2>
-<div class="columns" style="font-size:65%">
-<p>Because of how <span class="math inline">\(\mathbf{Q}\)</span> is defined <span class="citation" data-cites="horn1991">[<a href="#/references" role="doc-biblioref" onclick="">13</a>]</span>, we know that</p><p><span class="math display">\[
-\begin{aligned}
-\mathbf{Q} &amp;= \mathbf{V}\boldsymbol{\Lambda}\mathbf{V} \\
-&amp;= (\mathbf{V_{\rho_1}} \otimes \mathbf{V_{\rho_2}})(\boldsymbol \Lambda_{\rho_1} \otimes \mathbf{I} + \mathbf{I} \otimes \boldsymbol \Lambda_{\rho_2})^{\nu + 1}(\mathbf{V_{\rho_1}} \otimes \mathbf{V_{\rho_2}})^T
-\end{aligned}
-\]</span></p><p>where</p><p><span class="math display">\[
-\begin{aligned}
-\mathbf{Q}_{\rho_1} = \mathbf{V_{\rho_1}}\boldsymbol \Lambda_{\rho_1}\mathbf{V_{\rho_1}}^T \qquad \&amp; \qquad
-\mathbf{Q}_{\rho_2} = \mathbf{V_{\rho_2}}\boldsymbol \Lambda_{\rho_2}\mathbf{V_{\rho_2}}^T
-\end{aligned}
-\]</span></p><p>Spectral decomposition defined by value/vector pairs of smaller matrices</p><div class="column" style="width:50%;">
-<p><span class="math display">\[
-\left\{\lambda_{\rho_1}\right\}_i + \left\{\lambda_{\rho_2}\right\}_j
-\]</span></p>
-</div><div class="column" data-widht="50%">
-<p><span class="math display">\[
-\left\{\mathbf{v}_{\rho_1}\right\}_i \otimes \left\{\mathbf{v}_{\rho_2}\right\}_j
-\]</span></p>
-</div><ul>
-<li>Problem: <span class="math inline">\(\boldsymbol \Sigma_{ii} = \left(\mathbf Q^{-1} \right)_{ii} \neq  1\)</span></li>
-<li>Solution: <span class="math inline">\(\mathbf{\widetilde  Q} = \mathbf{D}\mathbf{Q}\mathbf{D}\)</span>, where <span class="math inline">\(\mathbf D_{ii} = \sqrt{\boldsymbol \Sigma_{ii}}\)</span></li>
-</ul>
-</div>
-</section>
-<section id="marginal-standard-deviations" class="slide level2">
-<h2>Marginal Standard Deviations</h2>
-<div style="font-size:70%">
-<p><span class="math display">\[
-\boldsymbol \Sigma = \mathbf Q^{-1} = (\mathbf{V}\boldsymbol\Lambda\mathbf{V}^T)^{-1} = \mathbf{V}\boldsymbol \Lambda^{-1}\mathbf{V}
-\]</span></p>
-<p>We know that if <span class="math inline">\(A = BC\)</span> then <span class="math inline">\(A_{ii} = B_{i, .} C_{., i}\)</span>, so</p>
-<p><span class="math display">\[
-\boldsymbol \Sigma_{ii} = \sum_{k=1}^{n} v_{ik} \frac{1}{\lambda_k} (v^T)_{ki} = \sum_{k=1}^{n} v_{ik} \frac{1}{\lambda_k} v_{ik} = \sum_{k=1}^{n} v_{ik}^2 \frac{1}{\lambda_k}
-\]</span></p>
-<p>Compute vector <span class="math inline">\(\boldsymbol \sigma^2\)</span> containing all marginal variances</p>
-<p><span class="math display">\[
-\boldsymbol \sigma^2 = \sum_{i = 1}^{n_1} \sum_{j=1}^{n_2} \frac{\left(\left\{\mathbf{v}_{\rho_1}\right\}_i \otimes \left\{\mathbf{v}_{\rho_2}\right\}_j\right)^{2}}{\quad\left(\left\{\lambda_{\rho_1}\right\}_i + \left\{\lambda_{\rho_2}\right\}_j\right)^{\nu+1}}
-\]</span></p>
-</div>
-</section>
-<section id="max-and-smooth-theory" class="slide level2">
-<h2>Max-and-Smooth: Theory</h2>
+<section id="max-and-smooth" class="slide level2">
+<h2>Max-and-Smooth</h2>
 <div class="columns" style="font-size:60%">
 <div class="column" style="width:50%;">
 <h3 id="two-step-approach">Two-Step Approach</h3>
@@ -489,94 +216,1012 @@ u &amp;\sim N(0, Q_u^{-1}), \quad \epsilon \sim N(0, Q_\epsilon^{-1})
 \]</span></p>
 </div>
 </section>
-<section id="max-and-smooth-our-application" class="slide level2" data-name="Methods">
-<h2>Max-and-Smooth: Our Application</h2>
+<section id="spatial-gaussian-copula" class="slide level2" data-name="Copula">
+<h2>Spatial Gaussian Copula</h2>
+</section>
+<section id="calculating-multivariate-normal-densities" class="slide level2">
+<h2>Calculating Multivariate Normal Densities</h2>
 <div class="columns" style="font-size:60%">
-<div class="column" style="width:50%;">
-<h3 id="implementation">Implementation</h3>
+<p><span class="math display">\[
+\log f(\mathbf{x}) \propto \frac{1}{2}\left(\log |\mathbf{Q}| - \mathbf{x}^T\mathbf{Q}\mathbf{x}\right)
+\]</span></p><div class="column" style="width:50%;">
+<h3 id="computational-challenges">Computational challenges</h3>
 <ol type="1">
-<li><strong>Max Step</strong>: GEV Parameters
+<li><strong>Log Determinant</strong>: <span class="math inline">\(\log |\mathbf{Q}|\)</span>
 <ul>
-<li>Local parameter estimates</li>
-<li>Copula dependence structure</li>
-<li>Hessian for uncertainty</li>
+<li>Constant for a given precision matrix</li>
 </ul></li>
-<li><strong>Smooth Step</strong>: BYM2 Model
+<li><strong>Quadratic Form</strong>: <span class="math inline">\(\mathbf{x}^T\mathbf{Q}\mathbf{x}\)</span>
 <ul>
-<li>Separate models per parameter</li>
-<li>Stan implementation</li>
-<li>Efficient sparse operations</li>
+<li>Needs calculation for each density evaluation</li>
 </ul></li>
 </ol>
 </div><div class="column" style="width:50%;">
-<h3 id="extensions">Extensions</h3>
+<h3 id="spatial-model-considerations">Spatial Model Considerations</h3>
 <ul>
-<li>Matérn-like copula
+<li>Some models (e.g., ICAR) avoid log determinant calculation</li>
+<li>Efficient computation crucial for large-scale applications</li>
+<li>Fast algorithms when <span class="math inline">\(\mathbf{Q}\)</span> is sparse <span class="citation" data-cites="rue2001 rue2005">[<a href="#/references" role="doc-biblioref" onclick="">1</a>–<a href="#/references" role="doc-biblioref" onclick="">2</a>]</span></li>
+</ul>
+</div></div>
+</section>
+<section id="spatial-models" class="slide level2">
+<h2>Spatial Models</h2>
+<div style="font-size:50%">
+<h4 id="conditional-autoregression-car-besag1974">Conditional Autoregression (CAR) <span class="citation" data-cites="besag1974">[<a href="#/references" role="doc-biblioref" onclick="">3</a>]</span></h4>
+<div class="columns">
+<div class="column" style="width:50%;">
 <ul>
-<li>Kronecker structure</li>
-<li>Flexible correlation</li>
-<li>Fast computation</li>
-</ul></li>
-<li>Parameter modeling
+<li><span class="math inline">\(\mathbf{D}\)</span> is a diagonal matrix with <span class="math inline">\(D_{ii} = n_i\)</span>, the number of neighbours of <span class="math inline">\(i\)</span></li>
+<li><span class="math inline">\(\mathbf{A}\)</span> is the adjacency matrix with <span class="math inline">\(A_{ij} = A_{ji} = 1\)</span> if <span class="math inline">\(i \sim j\)</span></li>
+</ul>
+</div><div class="column" style="width:50%;">
+<p><span class="math display">\[
+\begin{aligned}
+\mathbf{x} &amp;\sim N(\mathbf{0}, \tau \mathbf{Q}) \\
+\mathbf{Q} &amp;= \mathbf{D}\left(\mathbf{I} - \alpha \mathbf{A} \right)
+\end{aligned}
+\]</span></p>
+</div></div>
+<hr>
+<h4 id="intrinsic-conditional-autoregression-icar-besag1991">Intrinsic Conditional Autoregression (ICAR) <span class="citation" data-cites="besag1991">[<a href="#/references" role="doc-biblioref" onclick="">4</a>]</span></h4>
+<div class="columns">
+<div class="column" style="width:50%;">
 <ul>
-<li>Spatial smoothing</li>
-<li>Trend components</li>
-<li>Shape constraints</li>
-</ul></li>
+<li><span class="math inline">\(\alpha = 1\)</span>, so <span class="math inline">\(\mathbf Q\)</span> is singular, but constant</li>
+<li>Don’t have to calculate <span class="math inline">\(\log |\mathbf{Q}|\)</span></li>
+</ul>
+</div><div class="column" style="width:50%;">
+<p><span class="math display">\[
+\begin{aligned}
+\mathbf{x} &amp;\sim N(\mathbf{0}, \tau \mathbf{Q}) \\
+\mathbf{Q} &amp;= \mathbf{D} - \mathbf{A}
+\end{aligned}
+\]</span></p>
+</div></div>
+<hr>
+<div class="columns">
+<div class="column" style="width:50%;">
+<h4 id="bym-besag-york-mollié-model-besag1991">BYM (Besag-York-Mollié) Model <span class="citation" data-cites="besag1991">[<a href="#/references" role="doc-biblioref" onclick="">4</a>]</span></h4>
+<ul>
+<li><span class="math inline">\(\mathbf{u}\)</span> is the structured spatial component (Besag model)</li>
+<li><span class="math inline">\(\mathbf{v}\)</span> is the unstructured component (i.i.d. normal)</li>
+</ul>
+</div><div class="column" style="width:50%;">
+<p><span class="math display">\[
+\begin{aligned}
+\mathbf{x} &amp;= \mathbf{u} + \mathbf{v} \\
+\mathbf{u} &amp;\sim \mathrm{ICAR}(\tau_u) \\
+\mathbf{v} &amp;\sim N(\mathbf{0}, \tau_v^{-1})
+\end{aligned}
+\]</span></p>
+</div></div>
+<hr>
+<div class="columns">
+<div class="column" style="width:50%;">
+<h4 id="bym2-model-riebler2016-simpson2015">BYM2 Model <span class="citation" data-cites="riebler2016 simpson2015">[<a href="#/references" role="doc-biblioref" onclick="">5</a>–<a href="#/references" role="doc-biblioref" onclick="">6</a>]</span></h4>
+<ul>
+<li><span class="math inline">\(\rho\)</span> models how much of variance is spatial</li>
+<li><span class="math inline">\(s\)</span> is a scaling factor chosen to make <span class="math inline">\(\mathrm{Var}(\mathbf u_i) \approx 1\)</span></li>
+</ul>
+</div><div class="column" style="width:50%;">
+<p><span class="math display">\[
+\begin{aligned}
+\mathbf{x} &amp;= \left(\left(\sqrt{\rho/s}\right)\mathbf{u} + \left(\sqrt{1 - \rho}\right) \mathbf{v} \right)\sigma \\
+\mathbf{u} &amp;\sim \mathrm{ICAR}(1) \\
+\mathbf{v} &amp;\sim N(\mathbf{0}, n)
+\end{aligned}
+\]</span></p>
+</div></div>
+</div>
+</section>
+<section id="from-parameter-level-to-data-level-dependence" class="slide level2">
+<h2>From Parameter-level to Data-level Dependence</h2>
+<div class="columns" style="font-size:60%">
+<div class="column" style="width:50%;">
+<h3 id="parameter-level-dependence">Parameter-level Dependence</h3>
+<ul>
+<li>Assumes conditional independence</li>
+<li>Biased joint probability estimates</li>
+<li>Underestimates parameter variance</li>
+</ul>
+</div><div class="column" style="width:50%;">
+<h3 id="copula">Copula</h3>
+<ul>
+<li>Improves joint probabilities</li>
+<li>Enhances spatial risk assessment</li>
+<li>Better variance estimates</li>
 </ul>
 </div></div>
 <div style="font-size:65%; margin-top:20px;">
-<p><strong>Model Structure</strong>: For locations <span class="math inline">\(i=1,\ldots,p\)</span> and times <span class="math inline">\(t=1,\ldots,n\)</span>:</p>
+<p><strong>Sklar’s Theorem</strong>: For any multivariate distribution <span class="math inline">\(H\)</span>, there exists a unique copula <span class="math inline">\(C\)</span> such that:</p>
 <p><span class="math display">\[
-\begin{aligned}
-Y_{it} &amp;\sim \mathrm{GEV}(\mu_i, \sigma_i, \xi_i) \\
-Z_{it} &amp;= \Phi^{-1}(F_{\mathrm{GEV}}(Y_{it}|\mu_i,\sigma_i,\xi_i)) \\
-Z_t &amp;\sim \mathcal{N}(0, Q^{-1})
-\end{aligned}
+H(\mathbf x) = C(F_1(x_1), \dots, F_d(x_d))
+\]</span></p>
+<p>where <span class="math inline">\(F_i\)</span> are marginal distributions. We can also write this as a density</p>
+<p><span class="math display">\[
+h(x) = c(F_1(x_1), \dots, F_d(x_d)) \prod_{i=1}^d f_i(x_i)
 \]</span></p>
 </div>
+</section>
+<section id="matérn-like-gaussian-copula" class="slide level2">
+<h2>Matérn-like Gaussian Copula</h2>
+<div style="font-size:55%">
+<p><span class="math display">\[
+\begin{gathered}
+\log h(\mathbf x) = \log c\left(F_1(x_1), \dots, F_d(x_d)\right) + \sum_{i=1}^d \log f_i(x_i)
+\end{gathered}
+\]</span></p>
+<hr>
+<div class="columns">
+<h3 id="marginal-cdfs">Marginal CDFs</h3>
+<div class="column" style="width:50%;">
+<ul>
+<li><span class="math inline">\(F_i(x_i)\)</span> is <span class="math inline">\(\mathrm{GEV}(\mu_i, \sigma_i, \xi_i)\)</span></li>
+<li>Can model parameter dependence with BYM2</li>
+</ul>
+</div><div class="column" style="width:50%;">
+<p><span class="math display">\[
+\begin{aligned}
+\log h(\mathbf x) &amp;= \log c(u_1, \dots, u_d) \\
+&amp;+ \sum_{i=1}^d \log f_{\mathrm{GEV}}(x_i \vert \mu_i, \sigma_i, \xi_i) \\
+u_i &amp;= F_{\mathrm{GEV}}(x_i \vert \mu_i, \sigma_i, \xi_i)
+\end{aligned}
+\]</span></p>
+</div></div>
+<hr>
+<div class="columns">
+<h3 id="gaussian-copula">Gaussian Copula</h3>
+<div class="column" style="width:50%;">
+<ul>
+<li>Matérn-like precision matrix <span class="math inline">\(\mathbf{Q}\)</span> <span class="citation" data-cites="lindgren2011">[<a href="#/references" role="doc-biblioref" onclick="">7</a>]</span></li>
+<li>If <span class="math inline">\(\mathbf{Q} = \mathbf{I}\)</span> simplifies to independent margins</li>
+<li>Scaled so <span class="math inline">\(\boldsymbol{\Sigma} = \mathbf{Q}^{-1}\)</span> is correlation matrix</li>
+<li>Need to calculate marginal variances <span class="citation" data-cites="rue2005a rue2007 rue2009">[<a href="#/references" role="doc-biblioref" onclick="">8</a>–<a href="#/references" role="doc-biblioref" onclick="">10</a>]</span></li>
+<li>How to generate, scale and compute with <span class="math inline">\(\mathbf{Q}\)</span> quickly (for MCMC)?</li>
+</ul>
+</div><div class="column" style="width:50%;">
+<p><span class="math display">\[
+\begin{aligned}
+\log c(\mathbf u) &amp;\propto \frac{1}{2}\left(\log |\mathbf{Q}| - \mathbf{z}^T\mathbf{Q}\mathbf{z} + \mathbf{z}^T\mathbf{z}\right) \\
+\mathbf{z} &amp;= \Phi^{-1}(\mathbf u)
+\end{aligned}
+\]</span></p>
+</div></div>
+</div>
+</section>
+<section id="the-precision-matrix" class="slide level2">
+<h2>The Precision Matrix</h2>
+<div style="font-size:60%">
+<p><span class="math inline">\(\mathbf Q\)</span> defined as Kronecker sum of two AR(1) precision matrices, similar to <span class="citation" data-cites="lindgren2011">[<a href="#/references" role="doc-biblioref" onclick="">7</a>]</span></p>
+<p><span class="math display">\[
+\mathbf{Q} = \left( \mathbf{Q}_{\rho_1} \otimes \mathbf{I_{n_2}} + \mathbf{I_{n_1}} \otimes \mathbf{Q}_{\rho_2} \right)^{\nu + 1}, \quad \nu \in \{0, 1, 2\}
+\]</span></p>
+<div class="columns" style="font-size:80%">
+<div class="column" style="width:50%;">
+<p><span class="math display">\[
+\mathbf{Q}_{\rho_{1}} = \frac{1}{1-\rho_{1}^2}
+\begin{bmatrix}
+1 &amp; -\rho_{1} &amp; 0 &amp; \cdots &amp; 0 \\
+-\rho_{1} &amp; 1+\rho_{1}^2 &amp; -\rho_{1} &amp; \cdots &amp; 0 \\
+0 &amp; -\rho_{1} &amp; 1+\rho_{1}^2 &amp; \cdots &amp; 0 \\
+\vdots &amp; \vdots &amp; \vdots &amp; \ddots &amp; \vdots \\
+0 &amp; 0 &amp; 0 &amp; \cdots &amp; 1
+\end{bmatrix}
+\]</span></p>
+</div><div class="column" style="width:50%;">
+<p><span class="math display">\[
+\mathbf{Q}_{\rho_{2}} = \frac{1}{1-\rho_{2}^2}
+\begin{bmatrix}
+1 &amp; -\rho_{2} &amp; 0 &amp; \cdots &amp; 0 \\
+-\rho_{2} &amp; 1+\rho_{2}^2 &amp; -\rho_{2} &amp; \cdots &amp; 0 \\
+0 &amp; -\rho_{2} &amp; 1+\rho_{2}^2 &amp; \cdots &amp; 0 \\
+\vdots &amp; \vdots &amp; \vdots &amp; \ddots &amp; \vdots \\
+0 &amp; 0 &amp; 0 &amp; \cdots &amp; 1
+\end{bmatrix}
+\]</span></p>
+</div><p><span class="math display">\[
+\mathbf Q = \begin{bmatrix}
+\frac{1}{(1-\rho_1^2)}\mathbf{I_{n_2}} + \mathbf{Q_{\rho_2}} &amp; \frac{-\rho_1}{(1-\rho_1^2)}\mathbf{I_{n_2}} &amp; \dots &amp; \cdots &amp; \dots \\
+\frac{-\rho_1}{(1-\rho_1^2)}\mathbf{I_{n_2}} &amp; \frac{(1+\rho_1^2)}{(1-\rho_1^2)}\mathbf{I_{n_2}} + \mathbf{Q_{\rho_2}} &amp; \frac{-\rho_1}{(1-\rho_1^2)} \mathbf{I_{n_2}} &amp; \cdots &amp; \vdots  \\
+\vdots &amp; \ddots &amp; \ddots &amp; \ddots &amp; \vdots \\
+\dots &amp; \dots &amp; \cdots &amp; \frac{-\rho_1}{(1-\rho_1^2)} \mathbf{I_{n_2}} &amp; \frac{1}{(1-\rho_1^2)}\mathbf{I_{n_2}} + \mathbf{Q_{\rho_2}}
+\end{bmatrix}^{\nu + 1}
+\]</span></p>
+</div>
+</div>
+</section>
+<section id="eigendecomposition" class="slide level2">
+<h2>Eigendecomposition</h2>
+<div class="columns" style="font-size:65%">
+<p>Because of how <span class="math inline">\(\mathbf{Q}\)</span> is defined <span class="citation" data-cites="horn1991">[<a href="#/references" role="doc-biblioref" onclick="">11</a>]</span>, we know that</p><p><span class="math display">\[
+\begin{aligned}
+\mathbf{Q} &amp;= \mathbf{V}\boldsymbol{\Lambda}\mathbf{V} \\
+&amp;= (\mathbf{V_{\rho_1}} \otimes \mathbf{V_{\rho_2}})(\boldsymbol \Lambda_{\rho_1} \otimes \mathbf{I} + \mathbf{I} \otimes \boldsymbol \Lambda_{\rho_2})^{\nu + 1}(\mathbf{V_{\rho_1}} \otimes \mathbf{V_{\rho_2}})^T
+\end{aligned}
+\]</span></p><p>where</p><p><span class="math display">\[
+\begin{aligned}
+\mathbf{Q}_{\rho_1} = \mathbf{V_{\rho_1}}\boldsymbol \Lambda_{\rho_1}\mathbf{V_{\rho_1}}^T \qquad \&amp; \qquad
+\mathbf{Q}_{\rho_2} = \mathbf{V_{\rho_2}}\boldsymbol \Lambda_{\rho_2}\mathbf{V_{\rho_2}}^T
+\end{aligned}
+\]</span></p><p>Spectral decomposition defined by value/vector pairs of smaller matrices</p><div class="column" style="width:50%;">
+<p><span class="math display">\[
+\left\{\lambda_{\rho_1}\right\}_i + \left\{\lambda_{\rho_2}\right\}_j
+\]</span></p>
+</div><div class="column" data-widht="50%">
+<p><span class="math display">\[
+\left\{\mathbf{v}_{\rho_1}\right\}_i \otimes \left\{\mathbf{v}_{\rho_2}\right\}_j
+\]</span></p>
+</div><ul>
+<li>Problem: <span class="math inline">\(\boldsymbol \Sigma_{ii} = \left(\mathbf Q^{-1} \right)_{ii} \neq  1\)</span></li>
+<li>Solution: <span class="math inline">\(\mathbf{\widetilde  Q} = \mathbf{D}\mathbf{Q}\mathbf{D}\)</span>, where <span class="math inline">\(\mathbf D_{ii} = \sqrt{\boldsymbol \Sigma_{ii}}\)</span></li>
+</ul>
+</div>
+</section>
+<section id="marginal-standard-deviations" class="slide level2">
+<h2>Marginal Standard Deviations</h2>
+<div style="font-size:70%">
+<p><span class="math display">\[
+\boldsymbol \Sigma = \mathbf Q^{-1} = (\mathbf{V}\boldsymbol\Lambda\mathbf{V}^T)^{-1} = \mathbf{V}\boldsymbol \Lambda^{-1}\mathbf{V}
+\]</span></p>
+<p>We know that if <span class="math inline">\(A = BC\)</span> then <span class="math inline">\(A_{ii} = B_{i, .} C_{., i}\)</span>, so</p>
+<p><span class="math display">\[
+\boldsymbol \Sigma_{ii} = \sum_{k=1}^{n} v_{ik} \frac{1}{\lambda_k} (v^T)_{ki} = \sum_{k=1}^{n} v_{ik} \frac{1}{\lambda_k} v_{ik} = \sum_{k=1}^{n} v_{ik}^2 \frac{1}{\lambda_k}
+\]</span></p>
+<p>Compute vector <span class="math inline">\(\boldsymbol \sigma^2\)</span> containing all marginal variances</p>
+<p><span class="math display">\[
+\boldsymbol \sigma^2 = \sum_{i = 1}^{n_1} \sum_{j=1}^{n_2} \frac{\left(\left\{\mathbf{v}_{\rho_1}\right\}_i \otimes \left\{\mathbf{v}_{\rho_2}\right\}_j\right)^{2}}{\quad\left(\left\{\lambda_{\rho_1}\right\}_i + \left\{\lambda_{\rho_2}\right\}_j\right)^{\nu+1}}
+\]</span></p>
+</div>
+</section>
+<section id="max-step-iid-case" class="slide level2" data-name="Max-and-Smooth">
+<h2>Max-step: IID Case</h2>
+<div style="font-size:65%;">
+<ul>
+<li><span class="math inline">\(P\)</span>: number of stations, <span class="math inline">\(N\)</span>: replicates at each station</li>
+</ul>
+<p><strong>Independent Likelihood</strong>: Marginal GEV distributions:</p>
+<p><span class="math display">\[
+\ell(\theta|Y) = \sum_{i=1}^P \ell_{\text{GEV}}(Y_{i}|\mu_i,\sigma_i,\xi_i) =
+\sum_{i=1}^P \sum_{j=1}^N \ell_{\text{GEV}}(Y_{ij}|\mu_i,\sigma_i,\xi_i)
+\]</span></p>
+<p><strong>Multivariate Link Function</strong>: <span class="math display">\[
+\mu = e^\psi, \quad \sigma = e^{\psi + \tau}, \quad \xi = g(\phi)
+\]</span></p>
+<p><strong>Key Properties</strong>:</p>
+<ul>
+<li><span class="math inline">\(\mathbf Q_{\eta y}\)</span> is a banded matrix</li>
+<li>Parallel processing using L-BFGS with automatic differentiation</li>
+<li>Weak normal priors on transformed parameters</li>
+</ul>
+</div>
+</section>
+<section id="max-step-adding-dependence" class="slide level2">
+<h2>Max-step: Adding Dependence</h2>
+<div style="font-size:65%;">
+<p><strong>Combined Likelihood</strong>: Added Matérn-like Gaussian copula:</p>
+<p><span class="math display">\[
+\begin{gathered}
+\ell(\theta|Y) = \sum_{j=1}^N \left[\sum_{i=1}^P \ell_{\text{GEV}}(Y_{ij}|\mu_i,\sigma_i,\xi_i) + \frac{1}{2}\left(\log|\mathbf{Q}| - Z_j^T\mathbf{Q}Z_j + Z_j^TZ_j\right) \right], \\
+Z_j = \Phi^{-1}(U_j), \qquad
+U_{ij} = F_\mathrm{GEV}(Y_{ij} \vert \mu_i, \sigma_i, \xi_i)
+\end{gathered}
+\]</span></p>
+<p><strong>Key Changes</strong>:</p>
+<ul>
+<li><span class="math inline">\(\mathbf Q_{\eta y}\)</span> structure based on <span class="math inline">\(\nu\)</span>, smoothness in the copula</li>
+<li>Parallel processing of replicates instead of stations</li>
+<li><span class="math inline">\(\mathbf Q\)</span> assumed known</li>
+<li>Copula likelihood calculated using sparse representation of <span class="math inline">\(L\)</span></li>
+<li>Acklam’s Algorithm for <span class="math inline">\(\Phi^{-1}\)</span> <span class="citation" data-cites="AcklamInvNorm">[<a href="#/references" role="doc-biblioref" onclick="">12</a>]</span></li>
+</ul>
+</div>
+</section>
+<section id="smooth-step" class="slide level2">
+<h2>Smooth-step</h2>
+<div style="font-size:65%;">
+<p><strong>Gaussian Approximation</strong>: Based on sparse Cholesky factor, <span class="math inline">\(L\)</span>, of <span class="math inline">\(Q_{\eta y}\)</span></p>
+<p><span class="math display">\[
+\log p(\hat\eta \mid \eta, L) = \frac{1}{2}\log|Q_{\eta y}| - \frac{1}{2}\left\|\left(\sum_{j=1}^{n_i} L_{ij}(\hat\eta_{k_{ij}} - \eta_{k_{ij}})\right)_{i=1}^n\right\|^2
+\]</span></p>
+<p><strong>Spatial Prior</strong>: BYM2 <span class="citation" data-cites="riebler2016 simpson2015">[<a href="#/references" role="doc-biblioref" onclick="">5</a>–<a href="#/references" role="doc-biblioref" onclick="">6</a>]</span> model for each GEV parameter <span class="math inline">\(k\)</span></p>
+<p><span class="math display">\[
+\eta_k = \mu_k\mathbf{1} + \sigma_k(\sqrt{\rho_k/c} \cdot \eta^{\mathrm{spatial}}_k + \sqrt{1-\rho_k}\cdot\eta^{\mathrm{random}}_k),
+\]</span></p>
+<p>where <span class="math inline">\(c\)</span> is a scaling factor chosen so <span class="math inline">\(E_{\mathrm{geo}}\left[\mathrm{Var}(\eta^{\text{spatial}}_k)\right] = 1\)</span></p>
+<p><strong>Prior Specifications</strong>:</p>
+<ul>
+<li><span class="math inline">\(\eta^{\text{spatial}}_k \sim \text{ICAR}\)</span> <span class="citation" data-cites="besag1991">[<a href="#/references" role="doc-biblioref" onclick="">4</a>]</span> with sum-to-zero constraint</li>
+<li><span class="math inline">\(\eta^{\text{random}}_k \sim N(0,1)\)</span></li>
+<li><span class="math inline">\(\sigma_k \sim \text{Exp}(1)\)</span></li>
+<li><span class="math inline">\(\rho_k \sim \text{Beta}(1,1)\)</span></li>
+</ul>
+</div>
+</section>
+<section id="gaussian-copula-1" class="slide level2" data-name="Results">
+<h2>Gaussian Copula</h2>
+<div class="cell">
+<div class="cell-output-display">
+<div id="rwxbsuyjny" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#rwxbsuyjny table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#rwxbsuyjny thead, #rwxbsuyjny tbody, #rwxbsuyjny tfoot, #rwxbsuyjny tr, #rwxbsuyjny td, #rwxbsuyjny th {
+  border-style: none;
+}
+
+#rwxbsuyjny p {
+  margin: 0;
+  padding: 0;
+}
+
+#rwxbsuyjny .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#rwxbsuyjny .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#rwxbsuyjny .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#rwxbsuyjny .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#rwxbsuyjny .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#rwxbsuyjny .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#rwxbsuyjny .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#rwxbsuyjny .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#rwxbsuyjny .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#rwxbsuyjny .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#rwxbsuyjny .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#rwxbsuyjny .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#rwxbsuyjny .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#rwxbsuyjny .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#rwxbsuyjny .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#rwxbsuyjny .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#rwxbsuyjny .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#rwxbsuyjny .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#rwxbsuyjny .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#rwxbsuyjny .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#rwxbsuyjny .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#rwxbsuyjny .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#rwxbsuyjny .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#rwxbsuyjny .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#rwxbsuyjny .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#rwxbsuyjny .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#rwxbsuyjny .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#rwxbsuyjny .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#rwxbsuyjny .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#rwxbsuyjny .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#rwxbsuyjny .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#rwxbsuyjny .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#rwxbsuyjny .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#rwxbsuyjny .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#rwxbsuyjny .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#rwxbsuyjny .gt_left {
+  text-align: left;
+}
+
+#rwxbsuyjny .gt_center {
+  text-align: center;
+}
+
+#rwxbsuyjny .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#rwxbsuyjny .gt_font_normal {
+  font-weight: normal;
+}
+
+#rwxbsuyjny .gt_font_bold {
+  font-weight: bold;
+}
+
+#rwxbsuyjny .gt_font_italic {
+  font-style: italic;
+}
+
+#rwxbsuyjny .gt_super {
+  font-size: 65%;
+}
+
+#rwxbsuyjny .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#rwxbsuyjny .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#rwxbsuyjny .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#rwxbsuyjny .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#rwxbsuyjny .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#rwxbsuyjny .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#rwxbsuyjny .gt_indent_5 {
+  text-indent: 25px;
+}
+
+#rwxbsuyjny .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#rwxbsuyjny div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
+</style>
+
+<table class="gt_table caption-top" data-quarto-postprocess="true" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<caption>Benchmarking how long it takes to evaluate the density of a Mátern(ν)-like field with correlation parameter ρ, either unscaled or scaled to have unit marginal variance</caption>
+<colgroup>
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 11%">
+</colgroup>
+<thead>
+<tr class="gt_col_headings gt_spanner_row header">
+<th class="gt_center gt_columns_top_border gt_column_spanner_outer" data-quarto-table-cell-role="th" scope="col"></th>
+<th colspan="3" id="Unscaled" class="gt_center gt_columns_top_border gt_column_spanner_outer" data-quarto-table-cell-role="th" scope="colgroup"><div class="gt_column_spanner">
+Unscaled
+</div></th>
+<th colspan="5" id="Scaled" class="gt_center gt_columns_top_border gt_column_spanner_outer" data-quarto-table-cell-role="th" scope="colgroup"><div class="gt_column_spanner">
+Scaled
+</div></th>
+</tr>
+<tr class="gt_col_headings gt_spanner_row even">
+<th rowspan="2" id="Grid" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Grid</th>
+<th rowspan="2" id="Cholesky-(Unscaled)" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Cholesky</th>
+<th colspan="2" id="Eigen" class="gt_center gt_columns_top_border gt_column_spanner_outer" data-quarto-table-cell-role="th" scope="colgroup"><div class="gt_column_spanner">
+Eigen
+</div></th>
+<th rowspan="2" id="eig" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Eigen</th>
+<th colspan="2" id="Circulant" class="gt_center gt_columns_top_border gt_column_spanner_outer" data-quarto-table-cell-role="th" scope="colgroup"><div class="gt_column_spanner">
+Circulant
+</div></th>
+<th colspan="2" id="Folded" class="gt_center gt_columns_top_border gt_column_spanner_outer" data-quarto-table-cell-role="th" scope="colgroup"><div class="gt_column_spanner">
+Folded
+</div></th>
+</tr>
+<tr class="gt_col_headings header">
+<th id="Eigen-(Unscaled)" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Time</th>
+<th id="sp_3" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Relative</th>
+<th id="circ" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Time</th>
+<th id="sp_1" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Relative</th>
+<th id="fol" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Time</th>
+<th id="sp_2" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Relative</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_left" headers="Grid">20x20</td>
+<td class="gt_row gt_left" headers="Cholesky (Unscaled)">312.56µs</td>
+<td class="gt_row gt_left" headers="Eigen (Unscaled)">155.88µs</td>
+<td class="gt_row gt_right" headers="sp_3">49.9%</td>
+<td class="gt_row gt_left" headers="eig">235.59µs</td>
+<td class="gt_row gt_left" headers="circ">36.2µs</td>
+<td class="gt_row gt_right" headers="sp_1">15.4%</td>
+<td class="gt_row gt_left" headers="fol">115.09µs</td>
+<td class="gt_row gt_right" headers="sp_2">48.9%</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="Grid">40x40</td>
+<td class="gt_row gt_left gt_striped" headers="Cholesky (Unscaled)">1.77ms</td>
+<td class="gt_row gt_left gt_striped" headers="Eigen (Unscaled)">543.76µs</td>
+<td class="gt_row gt_right gt_striped" headers="sp_3">30.7%</td>
+<td class="gt_row gt_left gt_striped" headers="eig">1.65ms</td>
+<td class="gt_row gt_left gt_striped" headers="circ">115.8µs</td>
+<td class="gt_row gt_right gt_striped" headers="sp_1">7.0%</td>
+<td class="gt_row gt_left gt_striped" headers="fol">300.9µs</td>
+<td class="gt_row gt_right gt_striped" headers="sp_2">18.3%</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="Grid">60x60</td>
+<td class="gt_row gt_left" headers="Cholesky (Unscaled)">6.33ms</td>
+<td class="gt_row gt_left" headers="Eigen (Unscaled)">1.8ms</td>
+<td class="gt_row gt_right" headers="sp_3">28.5%</td>
+<td class="gt_row gt_left" headers="eig">7.1ms</td>
+<td class="gt_row gt_left" headers="circ">188.48µs</td>
+<td class="gt_row gt_right" headers="sp_1">2.7%</td>
+<td class="gt_row gt_left" headers="fol">609.71µs</td>
+<td class="gt_row gt_right" headers="sp_2">8.6%</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="Grid">80x80</td>
+<td class="gt_row gt_left gt_striped" headers="Cholesky (Unscaled)">17.98ms</td>
+<td class="gt_row gt_left gt_striped" headers="Eigen (Unscaled)">5.17ms</td>
+<td class="gt_row gt_right gt_striped" headers="sp_3">28.8%</td>
+<td class="gt_row gt_left gt_striped" headers="eig">21.96ms</td>
+<td class="gt_row gt_left gt_striped" headers="circ">338.15µs</td>
+<td class="gt_row gt_right gt_striped" headers="sp_1">1.5%</td>
+<td class="gt_row gt_left gt_striped" headers="fol">1.26ms</td>
+<td class="gt_row gt_right gt_striped" headers="sp_2">5.7%</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="Grid">100x100</td>
+<td class="gt_row gt_left" headers="Cholesky (Unscaled)">38.58ms</td>
+<td class="gt_row gt_left" headers="Eigen (Unscaled)">11.48ms</td>
+<td class="gt_row gt_right" headers="sp_3">29.8%</td>
+<td class="gt_row gt_left" headers="eig">48.44ms</td>
+<td class="gt_row gt_left" headers="circ">445.14µs</td>
+<td class="gt_row gt_right" headers="sp_1">0.9%</td>
+<td class="gt_row gt_left" headers="fol">2.37ms</td>
+<td class="gt_row gt_right" headers="sp_2">4.9%</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="Grid">120x120</td>
+<td class="gt_row gt_left gt_striped" headers="Cholesky (Unscaled)">81.1ms</td>
+<td class="gt_row gt_left gt_striped" headers="Eigen (Unscaled)">22.74ms</td>
+<td class="gt_row gt_right gt_striped" headers="sp_3">28.0%</td>
+<td class="gt_row gt_left gt_striped" headers="eig">88.45ms</td>
+<td class="gt_row gt_left gt_striped" headers="circ">719.55µs</td>
+<td class="gt_row gt_right gt_striped" headers="sp_1">0.8%</td>
+<td class="gt_row gt_left gt_striped" headers="fol">2.82ms</td>
+<td class="gt_row gt_right gt_striped" headers="sp_2">3.2%</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="Grid">140x140</td>
+<td class="gt_row gt_left" headers="Cholesky (Unscaled)">145.26ms</td>
+<td class="gt_row gt_left" headers="Eigen (Unscaled)">32.55ms</td>
+<td class="gt_row gt_right" headers="sp_3">22.4%</td>
+<td class="gt_row gt_left" headers="eig">168.38ms</td>
+<td class="gt_row gt_left" headers="circ">965.71µs</td>
+<td class="gt_row gt_right" headers="sp_1">0.6%</td>
+<td class="gt_row gt_left" headers="fol">5.39ms</td>
+<td class="gt_row gt_right" headers="sp_2">3.2%</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="Grid">160x160</td>
+<td class="gt_row gt_left gt_striped" headers="Cholesky (Unscaled)">233.03ms</td>
+<td class="gt_row gt_left gt_striped" headers="Eigen (Unscaled)">54.51ms</td>
+<td class="gt_row gt_right gt_striped" headers="sp_3">23.4%</td>
+<td class="gt_row gt_left gt_striped" headers="eig">260.7ms</td>
+<td class="gt_row gt_left gt_striped" headers="circ">1.27ms</td>
+<td class="gt_row gt_right gt_striped" headers="sp_1">0.5%</td>
+<td class="gt_row gt_left gt_striped" headers="fol">5.33ms</td>
+<td class="gt_row gt_right gt_striped" headers="sp_2">2.0%</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="Grid">180x180</td>
+<td class="gt_row gt_left" headers="Cholesky (Unscaled)">359.21ms</td>
+<td class="gt_row gt_left" headers="Eigen (Unscaled)">97.4ms</td>
+<td class="gt_row gt_right" headers="sp_3">27.1%</td>
+<td class="gt_row gt_left" headers="eig">482.93ms</td>
+<td class="gt_row gt_left" headers="circ">1.61ms</td>
+<td class="gt_row gt_right" headers="sp_1">0.3%</td>
+<td class="gt_row gt_left" headers="fol">10.22ms</td>
+<td class="gt_row gt_right" headers="sp_2">2.1%</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="Grid">200x200</td>
+<td class="gt_row gt_left gt_striped" headers="Cholesky (Unscaled)">567.01ms</td>
+<td class="gt_row gt_left gt_striped" headers="Eigen (Unscaled)">147.51ms</td>
+<td class="gt_row gt_right gt_striped" headers="sp_3">26.0%</td>
+<td class="gt_row gt_left gt_striped" headers="eig">676.53ms</td>
+<td class="gt_row gt_left gt_striped" headers="circ">1.84ms</td>
+<td class="gt_row gt_right gt_striped" headers="sp_1">0.3%</td>
+<td class="gt_row gt_left gt_striped" headers="fol">8.62ms</td>
+<td class="gt_row gt_right gt_striped" headers="sp_2">1.3%</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="Grid">220x220</td>
+<td class="gt_row gt_left" headers="Cholesky (Unscaled)">791.13ms</td>
+<td class="gt_row gt_left" headers="Eigen (Unscaled)">206.13ms</td>
+<td class="gt_row gt_right" headers="sp_3">26.1%</td>
+<td class="gt_row gt_left" headers="eig">994.11ms</td>
+<td class="gt_row gt_left" headers="circ">2.59ms</td>
+<td class="gt_row gt_right" headers="sp_1">0.3%</td>
+<td class="gt_row gt_left" headers="fol">13.55ms</td>
+<td class="gt_row gt_right" headers="sp_2">1.4%</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left gt_striped" headers="Grid">240x240</td>
+<td class="gt_row gt_left gt_striped" headers="Cholesky (Unscaled)">1.07s</td>
+<td class="gt_row gt_left gt_striped" headers="Eigen (Unscaled)">287ms</td>
+<td class="gt_row gt_right gt_striped" headers="sp_3">26.8%</td>
+<td class="gt_row gt_left gt_striped" headers="eig">1.34s</td>
+<td class="gt_row gt_left gt_striped" headers="circ">2.82ms</td>
+<td class="gt_row gt_right gt_striped" headers="sp_1">0.2%</td>
+<td class="gt_row gt_left gt_striped" headers="fol">14.77ms</td>
+<td class="gt_row gt_right gt_striped" headers="sp_2">1.1%</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</section>
+<section id="max-and-smooth-1" class="slide level2">
+<h2>Max-and-Smooth</h2>
+</section>
+<section id="future-work" class="slide level2" data-nem="Future Work">
+<h2>Future Work</h2>
 </section>
 <section id="references" class="title-slide slide level1 smaller scrollable">
 <h1>References</h1>
 <div id="refs" class="references csl-bib-body" style="font-size:55%" data-entry-spacing="0" role="list">
-<div id="ref-metoffi" class="csl-entry" role="listitem">
-<div class="csl-left-margin">1. </div><div class="csl-right-inline">Centre for Environmental Data Analysis, <a href="https://catalogue.ceda.ac.uk/uuid/e304987739e04cdc960598fa5e4439d0/">Met office hadley centre (2019): UKCP local projections on a 5km grid over the UK for 1980-2080.</a> (n.d.).</div>
-</div>
-<div id="ref-johannesson2021" class="csl-entry" role="listitem">
-<div class="csl-left-margin">2. </div><div class="csl-right-inline">Á. V. Johannesson, S. Siegert, R. Huser, H. Bakka, &amp; B. Hrafnkelsson, Approximate bayesian inference for analysis of spatio-temporal flood frequency data. (2021). https://doi.org/<a href="https://doi.org/10.48550/arXiv.1907.04763">10.48550/arXiv.1907.04763</a>.</div>
-</div>
 <div id="ref-rue2001" class="csl-entry" role="listitem">
-<div class="csl-left-margin">3. </div><div class="csl-right-inline">H. Rue, Fast sampling of Gaussian Markov random fields. <em>Journal of the Royal Statistical Society: Series B (Statistical Methodology)</em>, <strong>63</strong> (2001) 325–338. https://doi.org/<a href="https://doi.org/10.1111/1467-9868.00288">10.1111/1467-9868.00288</a>.</div>
+<div class="csl-left-margin">1. </div><div class="csl-right-inline">H. Rue, Fast sampling of Gaussian Markov random fields. <em>Journal of the Royal Statistical Society: Series B (Statistical Methodology)</em>, <strong>63</strong> (2001) 325–338. https://doi.org/<a href="https://doi.org/10.1111/1467-9868.00288">10.1111/1467-9868.00288</a>.</div>
 </div>
 <div id="ref-rue2005" class="csl-entry" role="listitem">
-<div class="csl-left-margin">4. </div><div class="csl-right-inline">H. Rue &amp; L. Held, <em>Gaussian Markov Random Fields: Theory and Applications</em> (CRC Press, 2005).</div>
+<div class="csl-left-margin">2. </div><div class="csl-right-inline">H. Rue &amp; L. Held, <em>Gaussian Markov Random Fields: Theory and Applications</em> (CRC Press, 2005).</div>
 </div>
 <div id="ref-besag1974" class="csl-entry" role="listitem">
-<div class="csl-left-margin">5. </div><div class="csl-right-inline">J. Besag, <a href="https://www.jstor.org/stable/2984812">Spatial interaction and the statistical analysis of lattice systems</a>. <em>Journal of the Royal Statistical Society. Series B (Methodological)</em>, <strong>36</strong> (1974) 192–236.</div>
+<div class="csl-left-margin">3. </div><div class="csl-right-inline">J. Besag, <a href="https://www.jstor.org/stable/2984812">Spatial interaction and the statistical analysis of lattice systems</a>. <em>Journal of the Royal Statistical Society. Series B (Methodological)</em>, <strong>36</strong> (1974) 192–236.</div>
 </div>
 <div id="ref-besag1991" class="csl-entry" role="listitem">
-<div class="csl-left-margin">6. </div><div class="csl-right-inline">J. Besag, J. York, &amp; A. Mollié, Bayesian image restoration, with two applications in spatial statistics. <em>Annals of the Institute of Statistical Mathematics</em>, <strong>43</strong> (1991) 1–20. https://doi.org/<a href="https://doi.org/10.1007/BF00116466">10.1007/BF00116466</a>.</div>
+<div class="csl-left-margin">4. </div><div class="csl-right-inline">J. Besag, J. York, &amp; A. Mollié, Bayesian image restoration, with two applications in spatial statistics. <em>Annals of the Institute of Statistical Mathematics</em>, <strong>43</strong> (1991) 1–20. https://doi.org/<a href="https://doi.org/10.1007/BF00116466">10.1007/BF00116466</a>.</div>
 </div>
 <div id="ref-riebler2016" class="csl-entry" role="listitem">
-<div class="csl-left-margin">7. </div><div class="csl-right-inline">A. Riebler, S. H. Sørbye, D. Simpson, &amp; H. Rue, <a href="https://journals.sagepub.com/doi/full/10.1177/0962280216660421">An intuitive bayesian spatial model for disease mapping that accounts for scaling</a>. (2016).</div>
+<div class="csl-left-margin">5. </div><div class="csl-right-inline">A. Riebler, S. H. Sørbye, D. Simpson, &amp; H. Rue, <a href="https://journals.sagepub.com/doi/full/10.1177/0962280216660421">An intuitive bayesian spatial model for disease mapping that accounts for scaling</a>. (2016).</div>
 </div>
 <div id="ref-simpson2015" class="csl-entry" role="listitem">
-<div class="csl-left-margin">8. </div><div class="csl-right-inline">D. P. Simpson, H. Rue, T. G. Martins, A. Riebler, &amp; S. H. Sørbye, <a href="http://arxiv.org/abs/1403.4630">Penalising model component complexity: A principled, practical approach to constructing priors</a>. (2015).</div>
+<div class="csl-left-margin">6. </div><div class="csl-right-inline">D. P. Simpson, H. Rue, T. G. Martins, A. Riebler, &amp; S. H. Sørbye, <a href="http://arxiv.org/abs/1403.4630">Penalising model component complexity: A principled, practical approach to constructing priors</a>. (2015).</div>
 </div>
 <div id="ref-lindgren2011" class="csl-entry" role="listitem">
-<div class="csl-left-margin">9. </div><div class="csl-right-inline">F. Lindgren, H. Rue, &amp; J. Lindström, An explicit link between Gaussian fields and Gaussian Markov random fields: the stochastic partial differential equation approach. <em>Journal of the Royal Statistical Society: Series B (Statistical Methodology)</em>, <strong>73</strong> (2011) 423–498. https://doi.org/<a href="https://doi.org/10.1111/j.1467-9868.2011.00777.x">10.1111/j.1467-9868.2011.00777.x</a>.</div>
+<div class="csl-left-margin">7. </div><div class="csl-right-inline">F. Lindgren, H. Rue, &amp; J. Lindström, An explicit link between Gaussian fields and Gaussian Markov random fields: the stochastic partial differential equation approach. <em>Journal of the Royal Statistical Society: Series B (Statistical Methodology)</em>, <strong>73</strong> (2011) 423–498. https://doi.org/<a href="https://doi.org/10.1111/j.1467-9868.2011.00777.x">10.1111/j.1467-9868.2011.00777.x</a>.</div>
 </div>
 <div id="ref-rue2005a" class="csl-entry" role="listitem">
-<div class="csl-left-margin">10. </div><div class="csl-right-inline">H. Rue, Marginal variances for gaussian markov random fields. (2005).</div>
+<div class="csl-left-margin">8. </div><div class="csl-right-inline">H. Rue, Marginal variances for gaussian markov random fields. (2005).</div>
 </div>
 <div id="ref-rue2007" class="csl-entry" role="listitem">
-<div class="csl-left-margin">11. </div><div class="csl-right-inline">Hå. Rue &amp; S. Martino, Approximate bayesian inference for hierarchical gaussian markov random field models. <em>Journal of Statistical Planning and Inference</em>, <strong>137</strong> (2007) 3177–3192. https://doi.org/<a href="https://doi.org/10.1016/j.jspi.2006.07.016">10.1016/j.jspi.2006.07.016</a>.</div>
+<div class="csl-left-margin">9. </div><div class="csl-right-inline">Hå. Rue &amp; S. Martino, Approximate bayesian inference for hierarchical gaussian markov random field models. <em>Journal of Statistical Planning and Inference</em>, <strong>137</strong> (2007) 3177–3192. https://doi.org/<a href="https://doi.org/10.1016/j.jspi.2006.07.016">10.1016/j.jspi.2006.07.016</a>.</div>
 </div>
 <div id="ref-rue2009" class="csl-entry" role="listitem">
-<div class="csl-left-margin">12. </div><div class="csl-right-inline">H. Rue, S. Martino, &amp; N. Chopin, Approximate Bayesian inference for latent Gaussian models by using integrated nested Laplace approximations. <em>Journal of the Royal Statistical Society: Series B (Statistical Methodology)</em>, <strong>71</strong> (2009) 319–392. https://doi.org/<a href="https://doi.org/10.1111/j.1467-9868.2008.00700.x">10.1111/j.1467-9868.2008.00700.x</a>.</div>
+<div class="csl-left-margin">10. </div><div class="csl-right-inline">H. Rue, S. Martino, &amp; N. Chopin, Approximate Bayesian inference for latent Gaussian models by using integrated nested Laplace approximations. <em>Journal of the Royal Statistical Society: Series B (Statistical Methodology)</em>, <strong>71</strong> (2009) 319–392. https://doi.org/<a href="https://doi.org/10.1111/j.1467-9868.2008.00700.x">10.1111/j.1467-9868.2008.00700.x</a>.</div>
 </div>
 <div id="ref-horn1991" class="csl-entry" role="listitem">
-<div class="csl-left-margin">13. </div><div class="csl-right-inline">R. A. Horn &amp; C. R. Johnson, <em><a href="https://www.cambridge.org/core/books/topics-in-matrix-analysis/B988495A235F1C3406EA484A2C477B03">Topics in matrix analysis</a></em> (Cambridge: Cambridge University Press, 1991).</div>
+<div class="csl-left-margin">11. </div><div class="csl-right-inline">R. A. Horn &amp; C. R. Johnson, <em><a href="https://www.cambridge.org/core/books/topics-in-matrix-analysis/B988495A235F1C3406EA484A2C477B03">Topics in matrix analysis</a></em> (Cambridge: Cambridge University Press, 1991).</div>
+</div>
+<div id="ref-AcklamInvNorm" class="csl-entry" role="listitem">
+<div class="csl-left-margin">12. </div><div class="csl-right-inline">P. J. Acklam, <a href="https://web.archive.org/web/20151030215612/http://home.online.no/~pjacklam/notes/invnorm/">Algorithm for the inverse normal distribution function</a>. (2003).</div>
 </div>
 </div>
 
@@ -798,6 +1443,44 @@ Z_t &amp;\sim \mathcal{N}(0, Q^{-1})
         ]
       });
     </script>
+    
+    <script>
+      // htmlwidgets need to know to resize themselves when slides are shown/hidden.
+      // Fire the "slideenter" event (handled by htmlwidgets.js) when the current
+      // slide changes (different for each slide format).
+      (function () {
+        // dispatch for htmlwidgets
+        function fireSlideEnter() {
+          const event = window.document.createEvent("Event");
+          event.initEvent("slideenter", true, true);
+          window.document.dispatchEvent(event);
+        }
+
+        function fireSlideChanged(previousSlide, currentSlide) {
+          fireSlideEnter();
+
+          // dispatch for shiny
+          if (window.jQuery) {
+            if (previousSlide) {
+              window.jQuery(previousSlide).trigger("hidden");
+            }
+            if (currentSlide) {
+              window.jQuery(currentSlide).trigger("shown");
+            }
+          }
+        }
+
+        // hookup for slidy
+        if (window.w3c_slidy) {
+          window.w3c_slidy.add_observer(function (slide_num) {
+            // slide_num starts at position 1
+            fireSlideChanged(null, w3c_slidy.slides[slide_num - 1]);
+          });
+        }
+
+      })();
+    </script>
+
     <script id="quarto-html-after-body" type="application/javascript">
     window.document.addEventListener("DOMContentLoaded", function (event) {
       const toggleBodyColorMode = (bsSheetEl) => {
