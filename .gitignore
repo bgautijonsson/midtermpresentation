@@ -4,5 +4,5 @@
 .httr-oauth
 .DS_Store
 .quarto
-notes
+presentation_notes
 /.quarto/

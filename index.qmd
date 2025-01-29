@@ -502,7 +502,11 @@ read_csv(here::here("data", "benchmark_matern_likelihood.csv")) |>
 
 ## Max-and-Smooth
 
-## Future Work {data-nem="Future Work"}
+## Paper 1 {data-name="Future Work"}
+
+## Paper 2
+
+## Paper 3
 
 
 
