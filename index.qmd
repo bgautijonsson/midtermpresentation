@@ -107,8 +107,6 @@ $$
 where $\eta$ is the latent field, $\theta$ are hyperparameters, and $\hat{\eta}$ are the local MLEs.
 :::
 
-## Spatial Gaussian Copula {data-name="Copula"}
-
 ## Calculating Multivariate Normal Densities
 
 ::: {.columns style="font-size:60%"}
@@ -253,7 +251,7 @@ $$
 
 :::
 
-## Matérn-like Gaussian Copula
+## Matérn-like Gaussian Copula {data-name="Copula"}
 
 ::: {style="font-size:55%"}
 
@@ -482,10 +480,16 @@ where $c$ is a scaling factor chosen so $E_{\mathrm{geo}}\left[\mathrm{Var}(\eta
 
 **Prior Specifications**:
 
+::: columns
+::: {.column width="60%"}
 - $\eta^{\text{spatial}}_k \sim \text{ICAR}$ [@besag1991] with sum-to-zero constraint
 - $\eta^{\text{random}}_k \sim N(0,1)$
+:::
+::: {.column width="40%"}
 - $\sigma_k \sim \text{Exp}(1)$
 - $\rho_k \sim \text{Beta}(1,1)$
+:::
+:::
 
 
 :::
@@ -563,7 +567,7 @@ read_csv(here::here("data", "benchmark_matern_likelihood.csv")) |>
 
 ## Paper 2
 
-::: {.columns style="font-size:60%"}
+::: {.columns style="font-size:60%; margin-bottom:0px; padding-bottom:0px;"}
 ::: {.column width="50%"}
 ### UKCP Local Projections
 
@@ -583,10 +587,12 @@ read_csv(here::here("data", "benchmark_matern_likelihood.csv")) |>
 :::
 :::
 
+::: {style="margin-top:-60px;padding-top:0px"}
 ```{dot}
 //| label: paper2
 //| file: paper2.dot
 ```
+:::
 
 ## Paper 3
 

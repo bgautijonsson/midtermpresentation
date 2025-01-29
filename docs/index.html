@@ -263,9 +263,6 @@ p(\eta, \theta \mid \hat{\eta}) \propto p(\hat{\eta} \mid \eta)p(\eta \mid \thet
 <p>where <span class="math inline">\(\eta\)</span> is the latent field, <span class="math inline">\(\theta\)</span> are hyperparameters, and <span class="math inline">\(\hat{\eta}\)</span> are the local MLEs.</p>
 </div>
 </section>
-<section id="spatial-gaussian-copula" class="slide level2" data-name="Copula">
-<h2>Spatial Gaussian Copula</h2>
-</section>
 <section id="calculating-multivariate-normal-densities" class="slide level2">
 <h2>Calculating Multivariate Normal Densities</h2>
 <div class="columns" style="font-size:60%">
@@ -391,7 +388,7 @@ h(x) = c(F_1(x_1), \dots, F_d(x_d)) \prod_{i=1}^d f_i(x_i)
 \]</span></p>
 </div>
 </section>
-<section id="matérn-like-gaussian-copula" class="slide level2">
+<section id="matérn-like-gaussian-copula" class="slide level2" data-name="Copula">
 <h2>Matérn-like Gaussian Copula</h2>
 <div style="font-size:55%">
 <p><span class="math display">\[
@@ -577,35 +574,41 @@ U_{ij} = F_\mathrm{GEV}(Y_{ij} \vert \mu_i, \sigma_i, \xi_i)
 \]</span></p>
 <p>where <span class="math inline">\(c\)</span> is a scaling factor chosen so <span class="math inline">\(E_{\mathrm{geo}}\left[\mathrm{Var}(\eta^{\text{spatial}}_k)\right] = 1\)</span></p>
 <p><strong>Prior Specifications</strong>:</p>
+<div class="columns">
+<div class="column" style="width:60%;">
 <ul>
 <li><span class="math inline">\(\eta^{\text{spatial}}_k \sim \text{ICAR}\)</span> <span class="citation" data-cites="besag1991">[<a href="#/references" role="doc-biblioref" onclick="">8</a>]</span> with sum-to-zero constraint</li>
 <li><span class="math inline">\(\eta^{\text{random}}_k \sim N(0,1)\)</span></li>
+</ul>
+</div><div class="column" style="width:40%;">
+<ul>
 <li><span class="math inline">\(\sigma_k \sim \text{Exp}(1)\)</span></li>
 <li><span class="math inline">\(\rho_k \sim \text{Beta}(1,1)\)</span></li>
 </ul>
+</div></div>
 </div>
 </section>
 <section id="gaussian-copula-1" class="slide level2" data-name="Results">
 <h2>Gaussian Copula</h2>
 <div class="cell">
 <div class="cell-output-display">
-<div id="qoiatblcep" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#qoiatblcep table {
+<div id="ptzyccuxwg" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#ptzyccuxwg table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#qoiatblcep thead, #qoiatblcep tbody, #qoiatblcep tfoot, #qoiatblcep tr, #qoiatblcep td, #qoiatblcep th {
+#ptzyccuxwg thead, #ptzyccuxwg tbody, #ptzyccuxwg tfoot, #ptzyccuxwg tr, #ptzyccuxwg td, #ptzyccuxwg th {
   border-style: none;
 }
 
-#qoiatblcep p {
+#ptzyccuxwg p {
   margin: 0;
   padding: 0;
 }
 
-#qoiatblcep .gt_table {
+#ptzyccuxwg .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -631,12 +634,12 @@ U_{ij} = F_\mathrm{GEV}(Y_{ij} \vert \mu_i, \sigma_i, \xi_i)
   border-left-color: #D3D3D3;
 }
 
-#qoiatblcep .gt_caption {
+#ptzyccuxwg .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#qoiatblcep .gt_title {
+#ptzyccuxwg .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -648,7 +651,7 @@ U_{ij} = F_\mathrm{GEV}(Y_{ij} \vert \mu_i, \sigma_i, \xi_i)
   border-bottom-width: 0;
 }
 
-#qoiatblcep .gt_subtitle {
+#ptzyccuxwg .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -660,7 +663,7 @@ U_{ij} = F_\mathrm{GEV}(Y_{ij} \vert \mu_i, \sigma_i, \xi_i)
   border-top-width: 0;
 }
 
-#qoiatblcep .gt_heading {
+#ptzyccuxwg .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -672,13 +675,13 @@ U_{ij} = F_\mathrm{GEV}(Y_{ij} \vert \mu_i, \sigma_i, \xi_i)
   border-right-color: #D3D3D3;
 }
 
-#qoiatblcep .gt_bottom_border {
+#ptzyccuxwg .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#qoiatblcep .gt_col_headings {
+#ptzyccuxwg .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -693,7 +696,7 @@ U_{ij} = F_\mathrm{GEV}(Y_{ij} \vert \mu_i, \sigma_i, \xi_i)
   border-right-color: #D3D3D3;
 }
 
-#qoiatblcep .gt_col_heading {
+#ptzyccuxwg .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -713,7 +716,7 @@ U_{ij} = F_\mathrm{GEV}(Y_{ij} \vert \mu_i, \sigma_i, \xi_i)
   overflow-x: hidden;
 }
 
-#qoiatblcep .gt_column_spanner_outer {
+#ptzyccuxwg .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -725,15 +728,15 @@ U_{ij} = F_\mathrm{GEV}(Y_{ij} \vert \mu_i, \sigma_i, \xi_i)
   padding-right: 4px;
 }
 
-#qoiatblcep .gt_column_spanner_outer:first-child {
+#ptzyccuxwg .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#qoiatblcep .gt_column_spanner_outer:last-child {
+#ptzyccuxwg .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#qoiatblcep .gt_column_spanner {
+#ptzyccuxwg .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -745,11 +748,11 @@ U_{ij} = F_\mathrm{GEV}(Y_{ij} \vert \mu_i, \sigma_i, \xi_i)
   width: 100%;
 }
 
-#qoiatblcep .gt_spanner_row {
+#ptzyccuxwg .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#qoiatblcep .gt_group_heading {
+#ptzyccuxwg .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -775,7 +778,7 @@ U_{ij} = F_\mathrm{GEV}(Y_{ij} \vert \mu_i, \sigma_i, \xi_i)
   text-align: left;
 }
 
-#qoiatblcep .gt_empty_group_heading {
+#ptzyccuxwg .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -790,15 +793,15 @@ U_{ij} = F_\mathrm{GEV}(Y_{ij} \vert \mu_i, \sigma_i, \xi_i)
   vertical-align: middle;
 }
 
-#qoiatblcep .gt_from_md > :first-child {
+#ptzyccuxwg .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#qoiatblcep .gt_from_md > :last-child {
+#ptzyccuxwg .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#qoiatblcep .gt_row {
+#ptzyccuxwg .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -817,7 +820,7 @@ U_{ij} = F_\mathrm{GEV}(Y_{ij} \vert \mu_i, \sigma_i, \xi_i)
   overflow-x: hidden;
 }
 
-#qoiatblcep .gt_stub {
+#ptzyccuxwg .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -830,7 +833,7 @@ U_{ij} = F_\mathrm{GEV}(Y_{ij} \vert \mu_i, \sigma_i, \xi_i)
   padding-right: 5px;
 }
 
-#qoiatblcep .gt_stub_row_group {
+#ptzyccuxwg .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -844,15 +847,15 @@ U_{ij} = F_\mathrm{GEV}(Y_{ij} \vert \mu_i, \sigma_i, \xi_i)
   vertical-align: top;
 }
 
-#qoiatblcep .gt_row_group_first td {
+#ptzyccuxwg .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#qoiatblcep .gt_row_group_first th {
+#ptzyccuxwg .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#qoiatblcep .gt_summary_row {
+#ptzyccuxwg .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -862,16 +865,16 @@ U_{ij} = F_\mathrm{GEV}(Y_{ij} \vert \mu_i, \sigma_i, \xi_i)
   padding-right: 5px;
 }
 
-#qoiatblcep .gt_first_summary_row {
+#ptzyccuxwg .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#qoiatblcep .gt_first_summary_row.thick {
+#ptzyccuxwg .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#qoiatblcep .gt_last_summary_row {
+#ptzyccuxwg .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -881,7 +884,7 @@ U_{ij} = F_\mathrm{GEV}(Y_{ij} \vert \mu_i, \sigma_i, \xi_i)
   border-bottom-color: #D3D3D3;
 }
 
-#qoiatblcep .gt_grand_summary_row {
+#ptzyccuxwg .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -891,7 +894,7 @@ U_{ij} = F_\mathrm{GEV}(Y_{ij} \vert \mu_i, \sigma_i, \xi_i)
   padding-right: 5px;
 }
 
-#qoiatblcep .gt_first_grand_summary_row {
+#ptzyccuxwg .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -901,7 +904,7 @@ U_{ij} = F_\mathrm{GEV}(Y_{ij} \vert \mu_i, \sigma_i, \xi_i)
   border-top-color: #D3D3D3;
 }
 
-#qoiatblcep .gt_last_grand_summary_row_top {
+#ptzyccuxwg .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -911,11 +914,11 @@ U_{ij} = F_\mathrm{GEV}(Y_{ij} \vert \mu_i, \sigma_i, \xi_i)
   border-bottom-color: #D3D3D3;
 }
 
-#qoiatblcep .gt_striped {
+#ptzyccuxwg .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#qoiatblcep .gt_table_body {
+#ptzyccuxwg .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -924,7 +927,7 @@ U_{ij} = F_\mathrm{GEV}(Y_{ij} \vert \mu_i, \sigma_i, \xi_i)
   border-bottom-color: #D3D3D3;
 }
 
-#qoiatblcep .gt_footnotes {
+#ptzyccuxwg .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -938,7 +941,7 @@ U_{ij} = F_\mathrm{GEV}(Y_{ij} \vert \mu_i, \sigma_i, \xi_i)
   border-right-color: #D3D3D3;
 }
 
-#qoiatblcep .gt_footnote {
+#ptzyccuxwg .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -947,7 +950,7 @@ U_{ij} = F_\mathrm{GEV}(Y_{ij} \vert \mu_i, \sigma_i, \xi_i)
   padding-right: 5px;
 }
 
-#qoiatblcep .gt_sourcenotes {
+#ptzyccuxwg .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -961,7 +964,7 @@ U_{ij} = F_\mathrm{GEV}(Y_{ij} \vert \mu_i, \sigma_i, \xi_i)
   border-right-color: #D3D3D3;
 }
 
-#qoiatblcep .gt_sourcenote {
+#ptzyccuxwg .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -969,72 +972,72 @@ U_{ij} = F_\mathrm{GEV}(Y_{ij} \vert \mu_i, \sigma_i, \xi_i)
   padding-right: 5px;
 }
 
-#qoiatblcep .gt_left {
+#ptzyccuxwg .gt_left {
   text-align: left;
 }
 
-#qoiatblcep .gt_center {
+#ptzyccuxwg .gt_center {
   text-align: center;
 }
 
-#qoiatblcep .gt_right {
+#ptzyccuxwg .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#qoiatblcep .gt_font_normal {
+#ptzyccuxwg .gt_font_normal {
   font-weight: normal;
 }
 
-#qoiatblcep .gt_font_bold {
+#ptzyccuxwg .gt_font_bold {
   font-weight: bold;
 }
 
-#qoiatblcep .gt_font_italic {
+#ptzyccuxwg .gt_font_italic {
   font-style: italic;
 }
 
-#qoiatblcep .gt_super {
+#ptzyccuxwg .gt_super {
   font-size: 65%;
 }
 
-#qoiatblcep .gt_footnote_marks {
+#ptzyccuxwg .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#qoiatblcep .gt_asterisk {
+#ptzyccuxwg .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#qoiatblcep .gt_indent_1 {
+#ptzyccuxwg .gt_indent_1 {
   text-indent: 5px;
 }
 
-#qoiatblcep .gt_indent_2 {
+#ptzyccuxwg .gt_indent_2 {
   text-indent: 10px;
 }
 
-#qoiatblcep .gt_indent_3 {
+#ptzyccuxwg .gt_indent_3 {
   text-indent: 15px;
 }
 
-#qoiatblcep .gt_indent_4 {
+#ptzyccuxwg .gt_indent_4 {
   text-indent: 20px;
 }
 
-#qoiatblcep .gt_indent_5 {
+#ptzyccuxwg .gt_indent_5 {
   text-indent: 25px;
 }
 
-#qoiatblcep .katex-display {
+#ptzyccuxwg .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#qoiatblcep div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#ptzyccuxwg div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -1255,7 +1258,7 @@ Folded
 </section>
 <section id="paper-2" class="slide level2">
 <h2>Paper 2</h2>
-<div class="columns" style="font-size:60%">
+<div class="columns" style="font-size:60%; margin-bottom:0px; padding-bottom:0px;">
 <div class="column" style="width:50%;">
 <h3 id="ukcp-local-projections">UKCP Local Projections</h3>
 <ul>
@@ -1273,6 +1276,7 @@ Folded
 <li>Improved 21st century projections</li>
 </ul>
 </div></div>
+<div style="margin-top:-60px;padding-top:0px">
 <div class="cell" data-file="paper2.dot" data-layout-align="default">
 <div class="cell-output-display">
 <div id="paper2">
@@ -1403,6 +1407,7 @@ Folded
 </g>
 </g>
 </svg>
+</div>
 </div>
 </div>
 </div>
