@@ -1320,7 +1320,7 @@ U_{ij} = F_\mathrm{GEV}(Y_{ij} \vert \mu_i, \sigma_i, \xi_i)
 <div style="font-size:65%;">
 <p><strong>Gaussian Approximation</strong>: Based on sparse Cholesky factor, <span class="math inline">\(L\)</span>, of <span class="math inline">\(Q_{\eta y}\)</span></p>
 <p><span class="math display">\[
-\log p(\hat\eta \mid \eta, L) = \frac{1}{2}\log|Q_{\eta y}| - \frac{1}{2}\left\|\left(\sum_{j=1}^{n_i} L_{ij}(\hat\eta_{k_{ij}} - \eta_{k_{ij}})\right)_{i=1}^n\right\|^2
+\log p(\hat\eta \mid \eta, L) = \frac{1}{2}\log|Q_{\eta y}| - \frac{1}{2}\left\|\left(\sum_{i=1}^{n_1n_2}\sum_{j=1}^{\vert \mathcal I(i) \vert} L_{i\mathcal I(i)_j}(\hat\eta_{i\mathcal I(i)_j} - \eta_{i\mathcal I(i)_j})\right)_{i=1}^n\right\|^2
 \]</span></p>
 <p><strong>Spatial Prior</strong>: BYM2 <span class="citation" data-cites="riebler2016 simpson2015">[<a href="#/references" role="doc-biblioref" onclick="">9</a>–<a href="#/references" role="doc-biblioref" onclick="">10</a>]</span> model for each GEV parameter <span class="math inline">\(k\)</span></p>
 <p><span class="math display">\[
@@ -1985,11 +1985,11 @@ Folded
 <section id="max-and-smooth-1" class="slide level2">
 <h2>Max-and-Smooth</h2>
 <div class="columns">
-<div class="column" style="width:50%;">
+<div class="column" style="width:45%;">
 <p><br> <br></p>
 <p><img data-src="images/post_bym2.png"></p>
-</div><div class="column" style="width:50%;">
-<p><img data-src="images/comparison.png"></p>
+</div><div class="column" style="width:55%;">
+<p><img data-src="images/comparison.png" style="margin-top:-80px;"></p>
 </div></div>
 </section>
 <section id="paper-1" class="slide level2" data-name="Future Work">

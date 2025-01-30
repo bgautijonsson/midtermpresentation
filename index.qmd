@@ -725,7 +725,7 @@ $$
 **Gaussian Approximation**: Based on sparse Cholesky factor, $L$, of $Q_{\eta y}$
 
 $$
-\log p(\hat\eta \mid \eta, L) = \frac{1}{2}\log|Q_{\eta y}| - \frac{1}{2}\left\|\left(\sum_{j=1}^{n_i} L_{ij}(\hat\eta_{k_{ij}} - \eta_{k_{ij}})\right)_{i=1}^n\right\|^2
+\log p(\hat\eta \mid \eta, L) = \frac{1}{2}\log|Q_{\eta y}| - \frac{1}{2}\left\|\left(\sum_{i=1}^{n_1n_2}\sum_{j=1}^{\vert \mathcal I(i) \vert} L_{i\mathcal I(i)_j}(\hat\eta_{i\mathcal I(i)_j} - \eta_{i\mathcal I(i)_j})\right)_{i=1}^n\right\|^2
 $$
 
 **Spatial Prior**: BYM2 [@riebler2016; @simpson2015] model for each GEV parameter $k$
@@ -797,19 +797,17 @@ read_csv(here::here("data", "benchmark_matern_likelihood.csv")) |>
 ```
 
 ## Max-and-Smooth
-
 ::: {.columns}
-::: {.column width=50%}
+::: {.column width=45%}
 <br>
 <br>
 
 ![](images/post_bym2.png)
 :::
-::: {.column width=50%}
-![](images/comparison.png)
+::: {.column width=55%}
+![](images/comparison.png){style="margin-top:-80px;"}
 :::
 :::
-
 
 
 ## Paper 1 {data-name="Future Work"}
